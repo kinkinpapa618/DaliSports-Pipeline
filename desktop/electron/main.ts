@@ -2,6 +2,10 @@ import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+
+// Prevent GPU shader disk cache lock issues on Windows
+app.commandLine.appendSwitch('disable-gpu-shader-disk-cache');
+
 import { TournamentService } from './services/tournamentService';
 import { TimelineService } from './services/timelineService';
 import { PipelineProcessService } from './services/pipelineProcessService';
@@ -217,19 +221,33 @@ function registerIpcHandlers() {
   });
 }
 
-app.whenReady().then(() => {
-  registerIpcHandlers();
-  createWindow();
+const gotTheLock = app.requestSingleInstanceLock();
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
+if (!gotTheLock) {
+  console.log('[DaliSports Studio] Another instance is already running. Quitting duplicate...');
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
     }
   });
-});
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
+  app.whenReady().then(() => {
+    registerIpcHandlers();
+    createWindow();
+
+    app.on('activate', () => {
+      if (BrowserWindow.getAllWindows().length === 0) {
+        createWindow();
+      }
+    });
+  });
+
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+      app.quit();
+    }
+  });
+}
