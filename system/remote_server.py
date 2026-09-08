@@ -125,7 +125,7 @@ def _run_tunnel_process(port: int):
             if m:
                 state.tunnel_url = m.group(0)
                 state.tunnel_error = None
-                print(f"\n[CLOUDFLARE TUNNEL SẴN SÀNG] Public URL: {state.tunnel_url}")
+                print(f"\n[CLOUDFLARE TUNNEL SAN SANG] Public URL: {state.tunnel_url}")
                 print_qr(state.tunnel_url)
                 break
     except Exception as e:
@@ -167,7 +167,7 @@ def print_qr(url: str):
         qr = qrcode.QRCode()
         qr.add_data(url)
         print("\n" + "=" * 50)
-        print(" QUÉT MÃ QR NÀY TRÊN ĐIỆN THOẠI ĐỂ TRUY CẬP TỪ XA:")
+        print(" QUET MA QR NAY TREN DIEN THOAI DE TRUY CAP TU XA:")
         print("=" * 50)
         qr.print_ascii(invert=True)
         print("=" * 50 + "\n")
@@ -712,14 +712,14 @@ def main():
         pass
 
     print("\n" + "=" * 65)
-    print("        DALISPORTS STUDIO - MÁY CHỦ TRUY CẬP TỪ XA")
+    print("        DALISPORTS STUDIO - MAY CHU TRUY CAP TU XA")
     print("=" * 65)
     print(f" [Local Web]     http://localhost:{args.port}")
-    print(f" [Mạng Nội Bộ]   http://{local_ip}:{args.port}")
+    print(f" [Mang Noi Bo]   http://{local_ip}:{args.port}")
     print("=" * 65)
 
     if args.tunnel:
-        print("\n[*] Đang khởi tạo Cloudflare Tunnel công khai...")
+        print("\n[*] Dang khoi tao Cloudflare Tunnel cong khai...")
         start_tunnel_service(args.port)
 
     uvicorn.run(app, host=args.host, port=args.port, log_level="info")

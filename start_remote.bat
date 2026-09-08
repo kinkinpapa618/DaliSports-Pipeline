@@ -1,28 +1,27 @@
 @echo off
 title DaliSports Studio - Remote Tunnel Launcher
-chcp 65001 >nul
 echo ========================================================
-echo       DALISPORTS STUDIO - TRUY CẬP TỪ XA QUA TUNNEL
+echo       DALISPORTS STUDIO - TRUY CAP TU XA QUA TUNNEL
 echo ========================================================
 echo.
 
-:: Kiểm tra nếu chưa có bản build web thì biên dịch
+:: Kiem tra neu chua co ban build web thi bien dich
 if not exist "%~dp0desktop\dist\index.html" (
-    echo [*] Đang chuẩn bị giao diện Web Studio...
+    echo [*] Dang bien dich giao dien Web Studio...
     cd /d "%~dp0desktop"
     call npm run build
     cd /d "%~dp0"
 )
 
-echo [*] Đang khởi động Máy Chủ Web và kết nối Cloudflare Tunnel...
-echo [*] Bạn có thể mở trên điện thoại, máy tính bảng hoặc laptop từ xa.
+echo [*] Dang khoi dong May Chu Web va ket noi Cloudflare Tunnel...
+echo [*] Ban co the mo tren dien thoai hoac may tinh bang tu xa.
 echo.
 
 python "%~dp0system\remote_server.py" --tunnel --port 8000
 
 if errorlevel 1 (
     echo.
-    echo [LỖI] Không thể khởi động máy chủ từ xa.
-    echo Vui lòng kiểm tra lại Python và thư viện cần thiết.
+    echo [LOI] Khong the khoi dong may chu tu xa.
+    echo Vui long kiem tra lai Python va cac thu vien can thiet.
     pause
 )
