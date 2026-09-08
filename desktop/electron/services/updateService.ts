@@ -3,6 +3,8 @@ import path from 'path';
 import { exec } from 'child_process';
 import { UpdateCheckResult, ApplyUpdateResult } from '../types';
 
+const DEFAULT_UPDATE_URL = 'https://raw.githubusercontent.com/kinkinpapa618/DaliSports-Pipeline/main/version.json';
+
 export class UpdateService {
   private workspaceRoot: string;
   private currentVersion: string;
@@ -19,10 +21,15 @@ export class UpdateService {
         const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
         if (pkg && pkg.version) return pkg.version;
       }
+      const rootPkg = path.join(this.workspaceRoot, 'package.json');
+      if (fs.existsSync(rootPkg)) {
+        const pkg = JSON.parse(fs.readFileSync(rootPkg, 'utf-8'));
+        if (pkg && pkg.version) return pkg.version;
+      }
     } catch (e) {
       console.warn('[UpdateService] Error reading package.json version:', e);
     }
-    return '1.0.0';
+    return '1.1.0';
   }
 
   public getCurrentVersion(): string {
@@ -62,7 +69,7 @@ export class UpdateService {
     let fetchError: string | undefined = undefined;
 
     // Check custom URL or default URL
-    const targetUrl = customUrl?.trim() || process.env.UPDATE_CHECK_URL?.trim();
+    const targetUrl = customUrl?.trim() || process.env.UPDATE_CHECK_URL?.trim() || DEFAULT_UPDATE_URL;
 
     if (targetUrl && (targetUrl.startsWith('http://') || targetUrl.startsWith('https://'))) {
       try {
@@ -159,6 +166,23 @@ export class UpdateService {
         });
       } catch (err: any) {
         logs.push(`Cảnh báo unblock: ${err?.message || err}`);
+      }
+
+      // Sync desktop/package.json with version.json if version.json has newer version
+      try {
+        const localVerJsonPath = path.join(this.workspaceRoot, 'version.json');
+        const pkgPath = path.join(this.workspaceRoot, 'desktop', 'package.json');
+        if (fs.existsSync(localVerJsonPath) && fs.existsSync(pkgPath)) {
+          const vJson = JSON.parse(fs.readFileSync(localVerJsonPath, 'utf-8'));
+          const pJson = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+          if (vJson.version && this.compareVersions(vJson.version, pJson.version) > 0) {
+            pJson.version = vJson.version;
+            fs.writeFileSync(pkgPath, JSON.stringify(pJson, null, 2), 'utf-8');
+            logs.push(`Đã đồng bộ phiên bản package.json lên v${vJson.version}.`);
+          }
+        }
+      } catch (syncErr: any) {
+        console.warn('[UpdateService] Version sync error:', syncErr);
       }
 
       logs.push('[3/3] Đang cập nhật gói và biên dịch phiên bản mới...');

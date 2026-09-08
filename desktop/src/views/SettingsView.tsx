@@ -33,7 +33,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   // Update State
   const [checkingUpdate, setCheckingUpdate] = useState(false);
   const [updateResult, setUpdateResult] = useState<UpdateCheckResult | null>(null);
-  const [currentAppVersion, setCurrentAppVersion] = useState('1.0.0');
+  const [currentAppVersion, setCurrentAppVersion] = useState('1.1.0');
 
   // Toggles for password masking
   const [showGeminiKey, setShowGeminiKey] = useState(false);
@@ -674,7 +674,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 <Shield className="w-4 h-4 text-[var(--accent-blue)]" />
                 <h3 className="text-xs font-bold text-[var(--text-main)]">Thông Tin Bản Quyền & Tác Giả</h3>
               </div>
-              <span className="text-[11px] text-[var(--accent-blue)] font-mono">v1.0.0</span>
+              <span className="text-[11px] text-[var(--accent-blue)] font-mono">v{currentAppVersion}</span>
             </div>
 
             <div className="p-3.5 bg-[var(--bg-input)] rounded-lg border border-[var(--border-subtle)] space-y-2 text-xs">

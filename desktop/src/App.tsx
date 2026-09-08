@@ -20,6 +20,7 @@ export const App: React.FC = () => {
   // Update System State
   const [updateInfo, setUpdateInfo] = useState<UpdateCheckResult | null>(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [appVersion, setAppVersion] = useState('1.1.0');
 
   // Load tournaments on startup
   const fetchTournaments = async () => {
@@ -38,6 +39,11 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     fetchTournaments();
+
+    // Fetch current app version
+    window.api?.getCurrentVersion?.().then((ver) => {
+      if (ver) setAppVersion(ver);
+    });
 
     // Check pipeline running status
     window.api?.isPipelineRunning().then((running) => {
@@ -77,6 +83,7 @@ export const App: React.FC = () => {
         onToggleSkin={toggleSkin}
         updateInfo={updateInfo}
         onOpenUpdateModal={() => setIsUpdateModalOpen(true)}
+        appVersion={appVersion}
       />
 
       {/* Warning when opened in regular browser instead of Electron */}

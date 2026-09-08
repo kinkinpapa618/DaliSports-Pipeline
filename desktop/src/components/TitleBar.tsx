@@ -10,6 +10,7 @@ interface TitleBarProps {
   onToggleSkin?: () => void;
   updateInfo?: UpdateCheckResult | null;
   onOpenUpdateModal?: () => void;
+  appVersion?: string;
 }
 
 export const TitleBar: React.FC<TitleBarProps> = ({ 
@@ -18,6 +19,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   onToggleSkin,
   updateInfo,
   onOpenUpdateModal,
+  appVersion,
 }) => {
   const handleMinimize = () => window.api?.windowMinimize();
   const handleMaximize = () => window.api?.windowMaximize();
@@ -32,9 +34,9 @@ export const TitleBar: React.FC<TitleBarProps> = ({
           DALISPORTS <span className="text-[var(--accent-blue)] font-semibold">STUDIO</span>
         </span>
         <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--bg-highlight)] text-[var(--text-muted)] font-mono border border-[var(--border-subtle)]">
-          v1.0
+          v{appVersion || '1.1.0'}
         </span>
-        {updateInfo && updateInfo.hasUpdate && (
+        {updateInfo && updateInfo.hasUpdate && updateInfo.latestVersion !== (appVersion || '1.1.0') && (
           <button
             onClick={onOpenUpdateModal}
             className="titlebar-no-drag flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#ff9f0a] text-white text-[10px] font-bold font-mono shadow-[0_2px_10px_rgba(255,159,10,0.35)] hover:brightness-110 transition-all cursor-pointer animate-pulse"
