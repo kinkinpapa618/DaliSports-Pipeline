@@ -47,6 +47,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.middleware("http")
+async def add_custom_header(request, call_next):
+    response = await call_next(request)
+    response.headers["X-Dali-Server"] = "local-remote-server-v1"
+    return response
+
 # Global State
 class ServerState:
     def __init__(self):
@@ -181,9 +187,15 @@ def print_qr(url: str):
 @app.get("/api/tunnel/status")
 async def get_tunnel_status():
     active = state.tunnel_proc is not None and state.tunnel_proc.poll() is None and state.tunnel_url is not None
+    url = state.tunnel_url
+    if not url:
+        custom_domain = os.environ.get("CLOUDFLARE_CUSTOM_DOMAIN", "stu.trongtaiso.com").strip()
+        if custom_domain:
+            url = f"https://{custom_domain}" if not custom_domain.startswith("http") else custom_domain
+            active = True
     return {
         "active": active,
-        "url": state.tunnel_url,
+        "url": url,
         "error": state.tunnel_error,
     }
 

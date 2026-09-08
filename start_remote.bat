@@ -13,15 +13,38 @@ if not exist "%~dp0desktop\dist\index.html" (
     cd /d "%~dp0"
 )
 
-echo [*] Dang khoi dong May Chu Web va ket noi Cloudflare Tunnel...
-echo [*] Ban co the mo tren dien thoai hoac may tinh bang tu xa.
-echo.
-
-python "%~dp0system\remote_server.py" --tunnel --port 8000
-
-if errorlevel 1 (
+:: Kiem tra neu port 8000 da duoc mo boi PM2 hoac tien trinh khac
+netstat -ano | findstr :8000 | findstr LISTENING >nul 2>&1
+if not errorlevel 1 (
+    echo [*] May chu DaliSports Studio da duoc khoi dong va dang chay!
     echo.
-    echo [LOI] Khong the khoi dong may chu tu xa.
-    echo Vui long kiem tra lai Python va cac thu vien can thiet.
-    pause
+    echo ========================================================
+    echo  DOMAIN TU XA:  https://stu.trongtaiso.com
+    echo  MANG NOI BO:   http://localhost:8000
+    echo ========================================================
+    echo.
+    echo [*] Dang mo trinh duyet toi: https://stu.trongtaiso.com
+    start https://stu.trongtaiso.com
+    goto :end
 )
+
+:: Neu chua chay, khoi dong qua PM2 neu co hoac python truc tiep
+where pm2 >nul 2>&1
+if not errorlevel 1 (
+    echo [*] Khoi dong bang PM2 daemon...
+    pm2 start "%~dp0system\remote_server.py" --name dalisports-remote --interpreter python
+    pm2 save
+    timeout /t 2 >nul
+    start https://stu.trongtaiso.com
+    goto :end
+)
+
+echo [*] Dang khoi dong May Chu Web...
+python "%~dp0system\remote_server.py" --port 8000
+
+:end
+echo.
+echo ========================================================
+echo  Nhan phim bat ky de dong cua so nay...
+echo ========================================================
+pause >nul
