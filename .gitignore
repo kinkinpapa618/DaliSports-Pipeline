@@ -63,6 +63,8 @@ yt_profile/
 *.bak
 *.tmp
 *.temp
+*.zip
+*.tar.gz
 fine_match_scan.txt
 scan_early_matches.txt
 intro_card_timestamps.txt
