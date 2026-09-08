@@ -50,13 +50,17 @@ yt_profile/
 *.mkv
 *.avi
 *.mov
-*.ts
+*.m2ts
 *.flv
 *.webm
 2026-*/
 **/video/
 **/clips/
 **/thumbnails/
+
+# Whitelist TypeScript source code
+!desktop/**/*.ts
+!desktop/**/*.tsx
 
 # Logs & Temporary files
 *.log

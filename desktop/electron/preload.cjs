@@ -35,6 +35,8 @@ contextBridge.exposeInMainWorld('api', {
   // Updates
   checkForUpdates: (customUrl) => ipcRenderer.invoke('update:check', customUrl),
   getCurrentVersion: () => ipcRenderer.invoke('update:getVersion'),
+  applyUpdate: () => ipcRenderer.invoke('update:apply'),
+  restartApp: () => ipcRenderer.invoke('app:restart'),
 
   // Window Controls
   windowMinimize: () => ipcRenderer.send('window:minimize'),

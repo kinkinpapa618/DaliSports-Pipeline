@@ -3,7 +3,7 @@ import {
   Settings, Key, Video, Globe, HardDrive, 
   CheckCircle, AlertCircle, Shield, FolderOpen, Save,
   Eye, EyeOff, ExternalLink, RefreshCw, Sparkles, Sun, Moon,
-  ArrowUpCircle, Download
+  ArrowUpCircle, Download, Zap, Loader2, RotateCw
 } from 'lucide-react';
 import { EnvConfig, UpdateCheckResult } from '../types';
 import { SkinMode } from '../hooks/useSkin';
@@ -38,6 +38,37 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   // Toggles for password masking
   const [showGeminiKey, setShowGeminiKey] = useState(false);
   const [showFbToken, setShowFbToken] = useState(false);
+
+  // Updates apply state
+  const [isApplyingUpdate, setIsApplyingUpdate] = useState(false);
+  const [applyUpdateSuccess, setApplyUpdateSuccess] = useState(false);
+  const [applyUpdateError, setApplyUpdateError] = useState('');
+
+  const handleApplyUpdate = async () => {
+    if (!window.api?.applyUpdate) return;
+    setIsApplyingUpdate(true);
+    setApplyUpdateError('');
+    try {
+      const res = await window.api.applyUpdate();
+      if (res.success) {
+        setApplyUpdateSuccess(true);
+      } else {
+        setApplyUpdateError(res.message);
+      }
+    } catch (err: any) {
+      setApplyUpdateError(err?.message || 'Lỗi cập nhật');
+    } finally {
+      setIsApplyingUpdate(false);
+    }
+  };
+
+  const handleRestart = () => {
+    if (window.api?.restartApp) {
+      window.api.restartApp();
+    } else {
+      window.location.reload();
+    }
+  };
 
   // File status
   const [status, setStatus] = useState<Partial<EnvConfig>>({
@@ -319,17 +350,66 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                       </span>
                     )}
                   </div>
-                  {updateResult.downloadUrl && (
-                    <button
-                      type="button"
-                      onClick={() => window.api?.openUrl(updateResult.downloadUrl!)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-md transition-all cursor-pointer w-fit"
-                    >
-                      <Download className="w-3.5 h-3.5 stroke-[2.5]" />
-                      <span>Tải Bản v{updateResult.latestVersion} Ngay</span>
-                    </button>
-                  )}
+                  
+                  <div className="flex items-center gap-2">
+                    {applyUpdateSuccess ? (
+                      <button
+                        type="button"
+                        onClick={handleRestart}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#30d158] hover:bg-[#28b84c] text-slate-950 font-bold text-xs shadow-md shadow-[#30d158]/30 transition-all cursor-pointer w-fit"
+                      >
+                        <RotateCw className="w-3.5 h-3.5" />
+                        <span>Khởi Động Lại Ngay</span>
+                      </button>
+                    ) : (
+                      <>
+                        <button
+                          type="button"
+                          disabled={isApplyingUpdate}
+                          onClick={handleApplyUpdate}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-slate-950 font-bold text-xs shadow-md transition-all cursor-pointer w-fit"
+                          title="Cập nhật tự động mã nguồn và hệ thống mà không cần mở trình duyệt"
+                        >
+                          {isApplyingUpdate ? (
+                            <>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              <span>Đang Cập Nhật...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Zap className="w-3.5 h-3.5 fill-current stroke-[2.5]" />
+                              <span>⚡ Cập Nhật Tự Động</span>
+                            </>
+                          )}
+                        </button>
+                        {updateResult.downloadUrl && (
+                          <button
+                            type="button"
+                            onClick={() => window.api?.openUrl(updateResult.downloadUrl!)}
+                            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors cursor-pointer"
+                            title="Tải gói zip thủ công qua trình duyệt"
+                          >
+                            <Download className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
+
+                {applyUpdateSuccess && (
+                  <div className="p-2.5 rounded-lg bg-[#30d158]/15 border border-[#30d158]/30 text-[#30d158] text-xs flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 shrink-0" />
+                    <span>Hệ thống đã cập nhật thành công! Bấm "Khởi Động Lại Ngay" để áp dụng.</span>
+                  </div>
+                )}
+
+                {applyUpdateError && (
+                  <div className="p-2.5 rounded-lg bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    <span>Lỗi: {applyUpdateError}</span>
+                  </div>
+                )}
 
                 {updateResult.releaseNotes && updateResult.releaseNotes.length > 0 && (
                   <div className="pt-2 border-t border-emerald-500/20 space-y-1">
