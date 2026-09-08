@@ -374,20 +374,20 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               type="text"
               value={updateUrl}
               onChange={(e) => setUpdateUrl(e.target.value)}
-              placeholder="https://raw.githubusercontent.com/huumanh-bmb/DaliSports-Pipeline/main/version.json"
-              className="flex-1 px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 text-xs text-white font-mono focus:outline-none focus:border-emerald-500"
+              placeholder="https://raw.githubusercontent.com/kinkinpapa618/DaliSports-Pipeline/main/version.json"
+              className="flex-1 px-3 py-2 rounded-lg bg-[var(--bg-input)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] font-mono focus:outline-none focus:border-[var(--accent-blue)]"
             />
             <button
               type="button"
-              onClick={() => openUrl('https://github.com/huumanh-bmb/DaliSports-Pipeline/releases')}
-              className="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs flex items-center justify-center gap-1.5 transition-colors shrink-0"
+              onClick={() => openUrl('https://github.com/kinkinpapa618/DaliSports-Pipeline/releases')}
+              className="px-3 py-2 rounded-lg bg-[#242c36] hover:bg-[#2e3743] text-[var(--text-main)] text-xs flex items-center justify-center gap-1.5 border border-white/5 transition-colors shrink-0 cursor-pointer"
               title="Mở trang GitHub Releases"
             >
               <span>GitHub Releases</span>
               <ExternalLink className="w-3 h-3" />
             </button>
           </div>
-          <p className="text-[10px] text-slate-400 mt-1">
+          <p className="text-[10px] text-[var(--text-faint)] mt-1">
             Mặc định hệ thống sẽ kiểm tra tệp <code>version.json</code> trên repository để xác định bản cập nhật mới.
           </p>
         </div>
