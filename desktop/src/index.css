@@ -1,0 +1,666 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ==========================================================================
+       APPLE VISIONOS / IOS 18 DARK SYSTEM TOKENS (REFINED CONTRAST)
+       ========================================================================== */
+    --bg-dark: #14181d;          /* Main workspace canvas */
+    --bg-sidebar: #101418;       /* Deeper contrast for Sidebar & TitleBar */
+    --bg-element: #1f252d;       /* Cards & floating surfaces (crisp elevation) */
+    --bg-element-hover: #262e38; /* Card hover state */
+    --bg-highlight: #2e3844;     /* Active pill tabs, active menu buttons */
+    --bg-input: #101418;         /* Subtly recessed input & select fields */
+    --border-subtle: #2b3441;    /* Clean dividers & element borders */
+    --border-card: rgba(255, 255, 255, 0.07);
+    --text-main: #e2e8f0;        /* Clear, readable primary text */
+    --text-muted: #8492a6;       /* Clean secondary text */
+    --text-faint: #596778;       /* Subtle tertiary text */
+    --accent-blue: #0a84ff;      /* Apple SF Blue */
+    --accent-blue-hover: #0071e3;
+    --accent-orange: #ff9f0a;    /* Apple SF Orange */
+    --accent-green: #30d158;     /* Apple SF Green */
+    --apple-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: var(--apple-font);
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* ==========================================================================
+   DEFAULT DARK SCROLLBARS
+   ========================================================================== */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2b3441;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3e4b5c;
+}
+
+/* Electron Titlebar Dragging */
+.titlebar-drag-region {
+  -webkit-app-region: drag;
+}
+
+.titlebar-no-drag {
+  -webkit-app-region: no-drag;
+}
+
+/* ==========================================================================
+   USER TEMPLATE COMPONENTS (APPLE DARK / VISIONOS)
+   ========================================================================== */
+
+/* Nút tròn phía trên / Quick Action Icons */
+.circle-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--bg-element);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  font-size: 16px;
+  color: var(--text-main);
+  border: 1px solid var(--border-card);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.circle-btn:hover {
+  background: var(--bg-highlight);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.circle-btn:active {
+  transform: translateY(0px) scale(0.97);
+}
+
+/* Nút Xanh Apple Chuẩn (btn-blue) */
+.btn-blue {
+  background: var(--accent-blue);
+  color: #ffffff;
+  border: none;
+  padding: 9px 22px;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 13px;
+  box-shadow: 0 4px 14px rgba(10, 132, 255, 0.35);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.btn-blue:hover {
+  background: var(--accent-blue-hover);
+  box-shadow: 0 6px 20px rgba(10, 132, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn-blue:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Thẻ Card Apple Bo Tròn 20px / Đổ bóng nổi đa tầng */
+.apple-card,
+.permission-card {
+  background: var(--bg-element);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--border-card);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.apple-card:hover {
+  border-color: rgba(10, 132, 255, 0.3);
+}
+
+/* Thanh Tab Menu Bo Dạng Capsule (.tab-bar & .tab-item) */
+.tab-bar {
+  background: #181e25;
+  border-radius: 50px;
+  padding: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border-card);
+}
+
+.tab-item {
+  padding: 7px 18px;
+  border-radius: 50px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.tab-item:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.tab-item.active {
+  background: var(--bg-highlight) !important;
+  color: var(--accent-blue) !important;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Nút Style Pill */
+.style-btn {
+  background: var(--bg-element);
+  padding: 12px 36px;
+  border-radius: 50px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  color: var(--text-main);
+  border: 1px solid var(--border-card);
+  transition: all 0.2s ease;
+}
+
+.style-btn:hover {
+  background: var(--bg-highlight);
+  transform: translateY(-1px);
+}
+
+/* Thanh Paste Bo Góc 20px */
+.paste-bar {
+  background: var(--bg-element);
+  border-radius: 20px;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border-card);
+}
+
+/* Control Center Widget */
+.control-center {
+  background: #14191f;
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cc-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #232b35;
+}
+
+.cc-row:last-child {
+  border-bottom: none;
+}
+
+.cc-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.cc-icon.orange { 
+  background-color: var(--accent-orange); 
+  color: #ffffff;
+}
+
+.cc-icon.blue { 
+  background-color: var(--accent-blue); 
+  color: #ffffff;
+}
+
+.cc-icon.green { 
+  background-color: var(--accent-green); 
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   DEFAULT DARK THEME: TAILWIND COLOR MAPPINGS TO VISIONOS TOKENS
+   ========================================================================== */
+:not([data-skin="light"]) .bg-\[\#0b0f19\],
+:not([data-skin="light"]) .bg-\[\#070b14\],
+:not([data-skin="light"]) .bg-\[\#0a0e17\] {
+  background-color: var(--bg-sidebar) !important;
+}
+
+:not([data-skin="light"]) .bg-slate-950,
+:not([data-skin="light"]) .bg-slate-950\/40,
+:not([data-skin="light"]) .bg-slate-950\/60,
+:not([data-skin="light"]) .bg-slate-950\/80 {
+  background-color: var(--bg-input) !important;
+}
+
+:not([data-skin="light"]) .bg-slate-900,
+:not([data-skin="light"]) .bg-slate-900\/60,
+:not([data-skin="light"]) .bg-slate-900\/70,
+:not([data-skin="light"]) .bg-slate-900\/80,
+:not([data-skin="light"]) .bg-slate-900\/90 {
+  background-color: var(--bg-element) !important;
+  border-color: var(--border-subtle) !important;
+}
+
+:not([data-skin="light"]) .bg-slate-800,
+:not([data-skin="light"]) .bg-slate-800\/40,
+:not([data-skin="light"]) .bg-slate-800\/50,
+:not([data-skin="light"]) .bg-slate-800\/60,
+:not([data-skin="light"]) .bg-slate-800\/80,
+:not([data-skin="light"]) .bg-slate-800\/90 {
+  background-color: var(--bg-highlight) !important;
+}
+
+:not([data-skin="light"]) .border-slate-800,
+:not([data-skin="light"]) .border-slate-800\/80,
+:not([data-skin="light"]) .border-slate-800\/60,
+:not([data-skin="light"]) .border-slate-800\/50,
+:not([data-skin="light"]) .border-slate-700,
+:not([data-skin="light"]) .border-slate-700\/80,
+:not([data-skin="light"]) .border-slate-700\/50 {
+  border-color: var(--border-subtle) !important;
+}
+
+:not([data-skin="light"]) .text-slate-100,
+:not([data-skin="light"]) .text-slate-200 {
+  color: var(--text-main) !important;
+}
+
+:not([data-skin="light"]) .text-slate-400,
+:not([data-skin="light"]) .text-slate-500 {
+  color: var(--text-muted) !important;
+}
+
+:not([data-skin="light"]) .hover\:bg-slate-800:hover,
+:not([data-skin="light"]) .hover\:bg-slate-800\/50:hover,
+:not([data-skin="light"]) .hover\:bg-slate-700:hover {
+  background-color: var(--bg-highlight) !important;
+}
+
+/* ==========================================================================
+   SKIN: "LIGHT" (APPLE - CLEAR - BASIC)
+   Refined macOS / iOS Design Language
+   ========================================================================== */
+[data-skin="light"] {
+  color-scheme: light;
+}
+
+[data-skin="light"] ::selection {
+  background: #b3d7ff;
+  color: #1d1d1f;
+}
+
+[data-skin="light"] body {
+  background-color: #f5f5f7 !important;
+  color: #1d1d1f !important;
+}
+
+/* Light Theme overrides for User's Template Classes */
+[data-skin="light"] .tab-bar {
+  background: #e5e5ea !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+  border-color: #d2d2d7 !important;
+}
+
+[data-skin="light"] .tab-item {
+  color: #6e6e73 !important;
+}
+
+[data-skin="light"] .tab-item:hover {
+  color: #1d1d1f !important;
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-skin="light"] .tab-item.active {
+  background: #ffffff !important;
+  color: #0071e3 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-skin="light"] .apple-card,
+[data-skin="light"] .permission-card,
+[data-skin="light"] .control-center,
+[data-skin="light"] .paste-bar {
+  background: #ffffff !important;
+  border: 1px solid #e5e5ea !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+  color: #1d1d1f !important;
+}
+
+[data-skin="light"] .circle-btn {
+  background: #f2f2f7 !important;
+  color: #1d1d1f !important;
+  border: 1px solid #e5e5ea !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-skin="light"] .circle-btn:hover {
+  background: #e5e5ea !important;
+}
+
+[data-skin="light"] .cc-row {
+  border-bottom-color: #e5e5ea !important;
+}
+
+/* Smooth Skin Transition */
+[data-skin="light"] .skin-transition,
+body[data-skin="light"] div,
+body[data-skin="light"] aside,
+body[data-skin="light"] main {
+  transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.15s ease;
+}
+
+/* Base Canvas & Outer Wrapper */
+[data-skin="light"] .bg-\[\#0b0f19\] {
+  background-color: #f5f5f7 !important;
+  color: #1d1d1f !important;
+}
+
+/* TitleBar in Apple Light */
+[data-skin="light"] .titlebar-drag-region {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #e5e5ea !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+[data-skin="light"] .titlebar-drag-region span.text-slate-200 {
+  color: #1d1d1f !important;
+  font-weight: 700;
+}
+
+[data-skin="light"] .titlebar-drag-region .bg-slate-800\/80 {
+  background-color: #f2f2f7 !important;
+  color: #6e6e73 !important;
+  border: 1px solid #e5e5ea;
+}
+
+[data-skin="light"] .titlebar-no-drag button {
+  color: #6e6e73 !important;
+}
+
+[data-skin="light"] .titlebar-no-drag button:hover {
+  background-color: #f2f2f7 !important;
+  color: #1d1d1f !important;
+}
+
+[data-skin="light"] .titlebar-no-drag button:last-child:hover {
+  background-color: #ff3b30 !important;
+  color: #ffffff !important;
+}
+
+/* Sidebar in Apple Light */
+[data-skin="light"] aside {
+  background-color: #f8f8fa !important;
+  border-right: 1px solid #e5e5ea !important;
+}
+
+[data-skin="light"] aside .text-slate-400 {
+  color: #6e6e73 !important;
+}
+
+[data-skin="light"] aside button.hover\:bg-slate-800\/50:hover {
+  background-color: #ececed !important;
+  color: #1d1d1f !important;
+}
+
+[data-skin="light"] aside .bg-slate-800\/60 {
+  background-color: #ffffff !important;
+  border: 1px solid #e5e5ea !important;
+  color: #1d1d1f !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+[data-skin="light"] aside .bg-slate-800 {
+  background-color: #e5e5ea !important;
+  color: #1d1d1f !important;
+}
+
+[data-skin="light"] aside .bg-slate-900\/80 {
+  background-color: #ffffff !important;
+  border: 1px solid #e5e5ea !important;
+  color: #6e6e73 !important;
+}
+
+[data-skin="light"] aside .text-slate-300 {
+  color: #1d1d1f !important;
+}
+
+[data-skin="light"] aside .border-slate-800\/80,
+[data-skin="light"] aside .border-slate-800\/60,
+[data-skin="light"] aside .border-slate-800 {
+  border-color: #e5e5ea !important;
+}
+
+/* Main Workspace Area */
+[data-skin="light"] main {
+  background-color: #f5f5f7 !important;
+}
+
+/* Cards, Panels & Containers (Apple Floating Surfaces) */
+[data-skin="light"] .bg-slate-900\/60,
+[data-skin="light"] .bg-slate-900\/70,
+[data-skin="light"] .bg-slate-900\/80,
+[data-skin="light"] .bg-slate-900\/90,
+[data-skin="light"] .bg-slate-900 {
+  background-color: #ffffff !important;
+  border: 1px solid #e5e5ea !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.02) !important;
+}
+
+[data-skin="light"] .hover\:border-slate-700:hover {
+  border-color: #d2d2d7 !important;
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+}
+
+[data-skin="light"] .hover\:shadow-xl:hover {
+  box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.03) !important;
+}
+
+/* Nested subcards and dark backgrounds */
+[data-skin="light"] .bg-slate-950,
+[data-skin="light"] .bg-slate-950\/40,
+[data-skin="light"] .bg-slate-950\/60,
+[data-skin="light"] .bg-slate-950\/80 {
+  background-color: #f9f9fb !important;
+  border-color: #e5e5ea !important;
+}
+
+/* Secondary Buttons, Chips & Interactive Controls */
+[data-skin="light"] .bg-slate-800,
+[data-skin="light"] .bg-slate-800\/80,
+[data-skin="light"] .bg-slate-800\/60,
+[data-skin="light"] .bg-slate-800\/50,
+[data-skin="light"] .bg-slate-800\/40 {
+  background-color: #f2f2f7 !important;
+  border-color: #e5e5ea !important;
+  color: #1d1d1f !important;
+}
+
+[data-skin="light"] .hover\:bg-slate-800:hover,
+[data-skin="light"] .hover\:bg-slate-700:hover {
+  background-color: #e5e5ea !important;
+  color: #1d1d1f !important;
+}
+
+/* Typography Overrides for Apple Crispness */
+[data-skin="light"] .text-slate-100,
+[data-skin="light"] .text-slate-200 {
+  color: #1d1d1f !important;
+}
+
+[data-skin="light"] .text-slate-300 {
+  color: #333336 !important;
+}
+
+[data-skin="light"] .text-slate-400 {
+  color: #6e6e73 !important;
+}
+
+[data-skin="light"] .text-slate-500 {
+  color: #86868b !important;
+}
+
+/* Headings text-white -> Deep Apple Charcoal (#1d1d1f) */
+[data-skin="light"] h1.text-white,
+[data-skin="light"] h2.text-white,
+[data-skin="light"] h3.text-white,
+[data-skin="light"] h4.text-white,
+[data-skin="light"] div.font-mono.text-white,
+[data-skin="light"] span.font-mono.text-white,
+[data-skin="light"] .text-white:not(button):not(button *):not(.btn-primary):not(.btn-primary *):not(.badge-solid):not(.badge-solid *) {
+  color: #1d1d1f !important;
+}
+
+/* Ensure colored action buttons keep readable text */
+[data-skin="light"] button.bg-blue-600,
+[data-skin="light"] button.bg-blue-600 *,
+[data-skin="light"] button.bg-red-600,
+[data-skin="light"] button.bg-red-600 *,
+[data-skin="light"] .bg-blue-600 .text-white,
+[data-skin="light"] .bg-red-600 .text-white {
+  color: #ffffff !important;
+}
+
+[data-skin="light"] button.from-emerald-500,
+[data-skin="light"] button.from-emerald-500 *,
+[data-skin="light"] button.bg-emerald-500,
+[data-skin="light"] button.bg-emerald-500 * {
+  color: #042f2e !important;
+}
+
+/* Code tags in Apple Light */
+[data-skin="light"] code {
+  background-color: #f2f2f7;
+  color: #1d1d1f;
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 1px solid #e5e5ea;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* Form Inputs, Selects & Textareas (Apple Minimal Inputs) */
+[data-skin="light"] input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),
+[data-skin="light"] select,
+[data-skin="light"] textarea {
+  background-color: #ffffff !important;
+  border: 1px solid #d2d2d7 !important;
+  color: #1d1d1f !important;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+}
+
+[data-skin="light"] input::placeholder,
+[data-skin="light"] textarea::placeholder {
+  color: #86868b !important;
+}
+
+[data-skin="light"] input:focus,
+[data-skin="light"] select:focus,
+[data-skin="light"] textarea:focus {
+  border-color: #0071e3 !important;
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15) !important;
+}
+
+/* Hairline Borders */
+[data-skin="light"] .border-slate-800,
+[data-skin="light"] .border-slate-800\/90,
+[data-skin="light"] .border-slate-800\/80,
+[data-skin="light"] .border-slate-800\/60,
+[data-skin="light"] .border-slate-800\/50,
+[data-skin="light"] .border-slate-700,
+[data-skin="light"] .border-slate-700\/60,
+[data-skin="light"] .border-slate-700\/50 {
+  border-color: #e5e5ea !important;
+}
+
+/* Modals & Dialogs in Light Mode */
+[data-skin="light"] .fixed.inset-0.bg-black\/80 {
+  background-color: rgba(0, 0, 0, 0.35) !important;
+  backdrop-filter: blur(14px) !important;
+}
+
+[data-skin="light"] .fixed.inset-0 .bg-slate-900 {
+  background-color: #ffffff !important;
+  border: 1px solid #e5e5ea !important;
+  box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Pipeline Console Terminal (Apple Xcode / macOS Terminal Style) */
+[data-skin="light"] .lg\:col-span-8.bg-\[\#070a12\] {
+  background-color: #141721 !important;
+  border: 1px solid #d2d2d7 !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-skin="light"] .lg\:col-span-8.bg-\[\#070a12\] .bg-slate-900\/90 {
+  background-color: #1e2230 !important;
+  border-bottom: 1px solid #2d3345 !important;
+}
+
+[data-skin="light"] .lg\:col-span-8.bg-\[\#070a12\] .text-slate-300 {
+  color: #f1f5f9 !important;
+}
+
+[data-skin="light"] .lg\:col-span-8.bg-\[\#070a12\] .bg-slate-800 {
+  background-color: #2b3145 !important;
+  color: #94a3b8 !important;
+}
+
+[data-skin="light"] .lg\:col-span-8.bg-\[\#070a12\] .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+/* Apple Light Scrollbars */
+[data-skin="light"] ::-webkit-scrollbar-track {
+  background: #f5f5f7 !important;
+}
+
+[data-skin="light"] ::-webkit-scrollbar-thumb {
+  background: #c7c7cc !important;
+}
+
+[data-skin="light"] ::-webkit-scrollbar-thumb:hover {
+  background: #aeaeb2 !important;
+}

@@ -1,0 +1,76 @@
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+cookies.txt
+client_secrets.json
+token.json
+upload_source_log.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+venv/
+ENV/
+
+# Node & Frontend (Desktop app)
+desktop/node_modules/
+desktop/dist/
+desktop/dist-electron/
+desktop/dist-app/
+desktop/release/
+.npm
+.eslintcache
+
+# Browser & OAuth profiles / caches
+browser_data/
+yt_profile/
+
+# Media & Tournaments Data (Videos, Clips, Large Assets)
+*.mp4
+*.mkv
+*.avi
+*.mov
+*.ts
+*.flv
+*.webm
+2026-*/
+**/video/
+**/clips/
+**/thumbnails/
+
+# Logs & Temporary files
+*.log
+*.bak
+*.tmp
+*.temp
+fine_match_scan.txt
+scan_early_matches.txt
+intro_card_timestamps.txt
+mota.txt.txt
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

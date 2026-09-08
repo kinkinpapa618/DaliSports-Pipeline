@@ -1,0 +1,15 @@
+{
+  "sport": "pickleball",
+  "tournament_full": "GIẢI PICKLEBALL DẠ HỘI MỞ RỘNG 2026",
+  "short_keyword": "Pickleball Dạ Hội 2026",
+  "location": "Sân Pickleball Dali Sports",
+  "date": "2026",
+  "organizer": "Dali Sports",
+  "court": "SÂN 1",
+  "hashtags": ["#pickleball", "#pickleballvietnam", "#DaliSports", "#pickleballhighlights", "#TheThaoVietNam"],
+  "tags": ["pickleball", "pickleball vietnam", "giải pickleball", "pickleball highlights", "đôi nam pickleball", "pickleball trình 5.0", "Dali Sports"],
+  "description_intro": "Trọn bộ {match_count} trận đấu Pickleball hấp dẫn tại {tournament_full} - {location} ngày {date}. Giải do {organizer} tổ chức với các nội dung Đôi Nam/Nữ, Trình 5.0/Open/Newbie.",
+  "description_outro": "🔔 Đăng ký kênh Dali Sports để xem full giải:\nhttps://www.youtube.com/@DaliSports2026\n🎵 TikTok: https://www.tiktok.com/@dali.sports\n📞 HOTLINE: 0984 387 999",
+  "title_source_template": "{tournament_full} | {court} | Trọn Bộ {match_count} Trận Pickleball | Full HD",
+  "title_clip_template": "{tournament_full} | {category} | {players} | {court}"
+}

@@ -1,0 +1,15 @@
+{
+  "sport": "pickleball",
+  "tournament_full": "GIẢI PICKLEBALL THỦY MOCHI LẦN 1 NĂM 2026",
+  "short_keyword": "Pickleball Thủy Mochi 2026",
+  "location": "Sân Pickleball Dali Sports",
+  "date": "07/09/2026",
+  "organizer": "Thủy Mochi x Dali Sports",
+  "court": "Full Giải",
+  "hashtags": ["#pickleball", "#pickleballvietnam", "#DaliSports", "#ThuyMochi", "#pickleballhighlights", "#TheThaoVietNam"],
+  "tags": ["giải pickleball thủy mochi", "pickleball thủy mochi 2026", "pickleball vietnam", "đôi hỗn hợp 4.4", "đôi hỗn hợp 4.8", "đôi nữ 4.0", "pickleball highlights", "Dali Sports"],
+  "description_intro": "Trọn bộ {match_count} trận đấu Pickleball hấp dẫn tại {tournament_full} - {location} ngày {date}. Giải do {organizer} tổ chức với các nội dung Đôi Hỗn Hợp 4.4 / 4.8, Đôi Nữ 4.0, Đôi Nam Nữ 4.2.",
+  "description_outro": "🔔 Đăng ký kênh Dali Sports để xem full giải:\nhttps://www.youtube.com/@DaliSports2026\n🎵 TikTok: https://www.tiktok.com/@dali.sports\n📞 HOTLINE: 0984 387 999",
+  "title_source_template": "{tournament_full} | Trọn Bộ {match_count} Trận Pickleball | Full HD",
+  "title_clip_template": "{tournament_full} | {category} | {players}"
+}

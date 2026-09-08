@@ -1,0 +1,15 @@
+{
+  "sport": "badminton",
+  "tournament_full": "GIẢI CẦU LÔNG HỒNG LOAN MỞ RỘNG NĂM 2026",
+  "short_keyword": "Hồng Loan 2026",
+  "location": "Nhà Thi Đấu Tỉnh Thái Bình (cũ)",
+  "date": "30/08/2026",
+  "organizer": "Hồng Loan",
+  "court": "SÂN 2",
+  "hashtags": ["#caulong", "#caulongvietnam", "#badminton", "#DaliSports", "#HongLoan2026", "#CauLongThaiBinh"],
+  "tags": ["giải cầu lông hồng loan", "cầu lông hồng loan 2026", "cầu lông thái bình", "giải cầu lông mở rộng", "badminton vietnam", "Dali Sports", "cầu lông phong trào"],
+  "description_intro": "Trọn bộ {match_count} trận đấu tại {tournament_full} - {location} ngày {date}. Giải đấu quy tụ các VĐV phong trào tranh tài sôi nổi ở các nội dung Đơn/Đôi, do {organizer} tổ chức.",
+  "description_outro": "🔔 Theo dõi Dali Sports:\n🔴 YouTube: https://www.youtube.com/@DaliSports2026\n🎵 TikTok: https://www.tiktok.com/@dali.sports\n📞 HOTLINE: 0984 387 999",
+  "title_source_template": "{tournament_full} | {court} | Trọn Bộ {match_count} Trận | Full HD",
+  "title_clip_template": "{tournament_full} | {category} | {players} | {court}"
+}

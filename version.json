@@ -1,0 +1,17 @@
+{
+  "version": "1.1.0",
+  "releaseDate": "2026-09-08",
+  "title": "DaliSports Studio v1.1.0",
+  "minAppVersion": "1.0.0",
+  "mandatory": false,
+  "releaseNotes": [
+    "Thêm Skin 'Apple Light' phong cách tối giản, thanh lịch, chuẩn mực Clean & Basic.",
+    "Bổ sung chức năng Kiểm tra và Cập nhật phiên bản mới (App Updates).",
+    "Nâng cấp thuật toán nhận diện và bóc tách bảng điểm Gemini 2.5 Flash.",
+    "Cải thiện độ ổn định và tốc độ cắt video highlight đa luồng FFmpeg.",
+    "Tối ưu hóa giao diện chỉnh sửa scoreboard timeline và xem trước SEO."
+  ],
+  "downloadUrl": "https://github.com/huumanh-bmb/DaliSports-Pipeline/releases/latest",
+  "changelogUrl": "https://github.com/huumanh-bmb/DaliSports-Pipeline/releases",
+  "packageSize": "68.5 MB"
+}

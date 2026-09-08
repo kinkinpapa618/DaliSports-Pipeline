@@ -1,0 +1,15 @@
+{
+  "sport": "badminton",
+  "tournament_full": "GIẢI CẦU LÔNG TTBC LẦN 1 - 2026",
+  "short_keyword": "TTBC 2026",
+  "location": "Nhà Thi Đấu Tỉnh Thái Bình",
+  "date": "30/08/2026",
+  "organizer": "TTBC",
+  "court": "SÂN 2",
+  "hashtags": ["#caulong", "#caulongvietnam", "#badminton", "#DaliSports", "#TTBC2026"],
+  "tags": ["cầu lông", "cầu lông việt nam", "giải cầu lông ttbc", "badminton vietnam", "badminton highlights", "cầu lông u15", "cầu lông u18", "Dali Sports"],
+  "description_intro": "Trọn bộ {match_count} trận đấu hạng mục U15/U18 Đơn & Đôi Nam/Nữ tại {tournament_full} - {location} ngày {date}. Giải do {organizer} tổ chức, quy tụ các VĐV trẻ tài năng tranh tài sôi nổi.",
+  "description_outro": "🔔 Đăng ký kênh Dali Sports để xem full giải:\nhttps://www.youtube.com/@DaliSports2026\n🎵 TikTok: https://www.tiktok.com/@dali.sports\n📞 HOTLINE: 0984 387 999",
+  "title_source_template": "{tournament_full} | {court} | Trọn Bộ {match_count} Trận U15-U18 | Full HD",
+  "title_clip_template": "{tournament_full} | {category} | {players} | {court}"
+}
