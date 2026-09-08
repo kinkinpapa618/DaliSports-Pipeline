@@ -53,12 +53,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   return (
-    <aside className="w-64 bg-[#101418] border-r border-[#1e252e] flex flex-col justify-between select-none transition-colors">
+    <aside className="w-64 bg-[var(--bg-sidebar)] border-r border-[var(--border-subtle)] flex flex-col justify-between select-none transition-colors">
       {/* Top Menu */}
       <div className="p-3 space-y-1.5">
-        <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-[#596778] flex items-center justify-between">
+        <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-[var(--text-faint)] flex items-center justify-between">
           <span>ĐIỀU KHIỂN HỆ THỐNG</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-[#0a84ff]" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent-blue)]" />
         </div>
 
         {menuItems.map((item) => {
@@ -69,20 +69,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               key={item.id}
               onClick={() => onTabChange(item.id)}
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-full text-xs font-medium transition-all ${
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
                 isActive
-                  ? 'bg-[#242c36] text-[#0a84ff] font-semibold shadow-[0_2px_10px_rgba(0,0,0,0.3)] border border-[#0a84ff]/25'
-                  : 'text-[#8492a6] hover:text-[#e2e8f0] hover:bg-[#181e25]'
+                  ? 'bg-[var(--bg-element)] text-[var(--accent-blue)] font-bold shadow-[0_2px_10px_rgba(0,0,0,0.08)] border border-[var(--accent-blue)]/25'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-highlight)]'
               }`}
             >
               <div className="flex items-center gap-3">
-                <Icon className={`w-4 h-4 ${isActive ? 'text-[#0a84ff]' : 'text-[#8492a6]'}`} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-[var(--accent-blue)]' : 'text-[var(--text-muted)]'}`} />
                 <span>{item.label}</span>
               </div>
 
               {item.badge !== undefined && (
                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
-                  isActive ? 'bg-[#0a84ff] text-white' : 'bg-[#181e25] text-[#8492a6]'
+                  isActive ? 'bg-[var(--accent-blue)] text-white' : 'bg-[var(--bg-highlight)] text-[var(--text-muted)]'
                 }`}>
                   {item.badge}
                 </span>
@@ -97,23 +97,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Bottom Actions & Apple Control Center Widget */}
-      <div className="p-3 border-t border-[#1e252e] space-y-2.5">
+      <div className="p-3 border-t border-[var(--border-subtle)] space-y-2.5">
         {/* Quick Skin Switcher */}
         {onToggleSkin && (
           <button
             onClick={onToggleSkin}
-            className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl bg-[#181e25] hover:bg-[#222a33] text-[#e2e8f0] text-xs font-medium transition-all border border-white/5 shadow-sm"
+            className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl bg-[var(--bg-element)] hover:bg-[var(--bg-highlight)] text-[var(--text-main)] text-xs font-medium transition-all border border-[var(--border-subtle)] shadow-sm cursor-pointer"
             title="Đổi giao diện nhanh giữa Studio Tối và Apple Sáng"
           >
             <div className="flex items-center gap-2">
               {skin === 'light' ? (
                 <Sun className="w-3.5 h-3.5 text-amber-500" />
               ) : (
-                <Moon className="w-3.5 h-3.5 text-[#0a84ff]" />
+                <Moon className="w-3.5 h-3.5 text-[var(--accent-blue)]" />
               )}
               <span>Giao Diện:</span>
             </div>
-            <span className="font-semibold text-[11px] text-[#0a84ff]">
+            <span className="font-semibold text-[11px] text-[var(--accent-blue)]">
               {skin === 'light' ? 'Apple Light' : 'Vision Dark'}
             </span>
           </button>
@@ -121,9 +121,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         <button
           onClick={onRefresh}
-          className="w-full flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-[#181e25] hover:bg-[#222a33] text-[#e2e8f0] text-xs font-medium transition-all border border-white/5 shadow-sm"
+          className="w-full flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-[var(--bg-element)] hover:bg-[var(--bg-highlight)] text-[var(--text-main)] text-xs font-medium transition-all border border-[var(--border-subtle)] shadow-sm cursor-pointer"
         >
-          <RefreshCw className="w-3.5 h-3.5 text-[#8492a6]" />
+          <RefreshCw className="w-3.5 h-3.5 text-[var(--text-muted)]" />
           <span>Làm Mới Dữ Liệu</span>
         </button>
 
@@ -133,31 +133,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div className="cc-icon orange !w-6 !h-6 !text-[11px]">
               <Zap className="w-3.5 h-3.5" />
             </div>
-            <div className="flex-1 text-[11px] text-[#e2e8f0] font-medium">Gemini 2.5 AI</div>
-            <div className="text-[10px] text-[#8492a6] font-mono">Active</div>
+            <div className="flex-1 text-[11px] text-[var(--text-main)] font-medium">Gemini 2.5 AI</div>
+            <div className="text-[10px] text-[var(--text-muted)] font-mono">Active</div>
           </div>
 
           <div className="cc-row !py-1.5">
             <div className="cc-icon blue !w-6 !h-6 !text-[11px]">
               <Activity className="w-3.5 h-3.5" />
             </div>
-            <div className="flex-1 text-[11px] text-[#e2e8f0] font-medium">FFmpeg Core</div>
+            <div className="flex-1 text-[11px] text-[var(--text-main)] font-medium">FFmpeg Core</div>
             <div className="text-[10px] text-[#30d158] font-mono">Ready</div>
           </div>
         </div>
 
         {/* Copyright Footer */}
-        <div className="pt-2 px-1 text-center border-t border-[#1e252e] space-y-0.5">
-          <div className="text-[11px] font-medium text-[#596778] flex items-center justify-center gap-1">
+        <div className="pt-2 px-1 text-center border-t border-[var(--border-subtle)] space-y-0.5">
+          <div className="text-[11px] font-medium text-[var(--text-faint)] flex items-center justify-center gap-1">
             <span>© 2026</span>
-            <span className="text-[#0a84ff] font-semibold">Hữu Mạnh - BMB</span>
+            <span className="text-[var(--accent-blue)] font-semibold">Hữu Mạnh - BMB</span>
           </div>
           <button
             onClick={() => window.api?.openUrl('mailto:huumanh.info@aol.com')}
-            className="text-[10px] text-[#596778] hover:text-[#0a84ff] transition-colors flex items-center justify-center gap-1 mx-auto font-mono hover:underline"
+            className="text-[10px] text-[var(--text-faint)] hover:text-[var(--accent-blue)] transition-colors flex items-center justify-center gap-1 mx-auto font-mono hover:underline cursor-pointer"
             title="Gửi email cho tác giả"
           >
-            <Mail className="w-3 h-3 text-[#596778]" />
+            <Mail className="w-3 h-3 text-[var(--text-faint)]" />
             <span>huumanh.info@aol.com</span>
           </button>
         </div>

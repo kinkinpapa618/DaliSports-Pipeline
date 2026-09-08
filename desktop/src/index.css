@@ -319,10 +319,31 @@
 
 /* ==========================================================================
    SKIN: "LIGHT" (APPLE - CLEAR - BASIC)
-   Refined macOS / iOS Design Language
+   Refined macOS / iOS Design Language (Pure Clean Cupertino Aesthetic)
    ========================================================================== */
-[data-skin="light"] {
+[data-skin="light"],
+html[data-skin="light"],
+body[data-skin="light"],
+.light {
   color-scheme: light;
+
+  /* Cupertino Light Design Tokens */
+  --bg-dark: #f5f5f7;          /* macOS System Gray 6 canvas */
+  --bg-sidebar: #fbfbfd;       /* Crisp macOS sidebar background */
+  --bg-element: #ffffff;       /* Pure white elevated cards */
+  --bg-element-hover: #f7f7f9; /* Card hover */
+  --bg-highlight: #e5e5ea;     /* Apple pill buttons & active menu pills */
+  --bg-highlight-hover: #dcdce2;
+  --bg-input: #ffffff;         /* Crisp white input */
+  --border-subtle: #e5e5ea;    /* Hairline dividers */
+  --border-card: #e5e5ea;
+  --text-main: #1d1d1f;        /* Apple Deep Charcoal primary text */
+  --text-muted: #6e6e73;       /* Apple System Gray secondary label */
+  --text-faint: #86868b;       /* Apple Tertiary Gray */
+  --accent-blue: #0071e3;      /* Apple Signature Blue */
+  --accent-blue-hover: #0077ed;
+  --accent-orange: #f56300;    /* Apple Vibrant Orange */
+  --accent-green: #28cd41;     /* Apple Crisp Green */
 }
 
 [data-skin="light"] ::selection {
@@ -331,15 +352,29 @@
 }
 
 [data-skin="light"] body {
-  background-color: #f5f5f7 !important;
+  background-color: var(--bg-dark) !important;
+  color: var(--text-main) !important;
+}
+
+/* ==========================================================================
+   APPLE LIGHT - CARD, TABS, DIALOGS & SURFACES
+   ========================================================================== */
+
+[data-skin="light"] .apple-card,
+[data-skin="light"] .permission-card,
+[data-skin="light"] .control-center,
+[data-skin="light"] .paste-bar {
+  background-color: #ffffff !important;
+  border: 1px solid #e5e5ea !important;
+  box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.05), 0 1px 3px -1px rgba(0, 0, 0, 0.03) !important;
   color: #1d1d1f !important;
 }
 
-/* Light Theme overrides for User's Template Classes */
+/* Tab Bar */
 [data-skin="light"] .tab-bar {
   background: #e5e5ea !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
-  border-color: #d2d2d7 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) inset !important;
+  border-color: #dcdce2 !important;
 }
 
 [data-skin="light"] .tab-item {
@@ -357,176 +392,107 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
 }
 
-[data-skin="light"] .apple-card,
-[data-skin="light"] .permission-card,
-[data-skin="light"] .control-center,
-[data-skin="light"] .paste-bar {
-  background: #ffffff !important;
-  border: 1px solid #e5e5ea !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
-  color: #1d1d1f !important;
-}
-
+/* Circle Quick Action Buttons */
 [data-skin="light"] .circle-btn {
-  background: #f2f2f7 !important;
+  background: #ffffff !important;
   color: #1d1d1f !important;
   border: 1px solid #e5e5ea !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04) !important;
 }
 
 [data-skin="light"] .circle-btn:hover {
-  background: #e5e5ea !important;
+  background: #f2f2f7 !important;
+  border-color: #d2d2d7 !important;
+  color: #0071e3 !important;
 }
 
-[data-skin="light"] .cc-row {
-  border-bottom-color: #e5e5ea !important;
-}
-
-/* Smooth Skin Transition */
-[data-skin="light"] .skin-transition,
-body[data-skin="light"] div,
-body[data-skin="light"] aside,
-body[data-skin="light"] main {
-  transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-              color 0.15s ease;
-}
-
-/* Base Canvas & Outer Wrapper */
-[data-skin="light"] .bg-\[\#0b0f19\] {
-  background-color: #f5f5f7 !important;
-  color: #1d1d1f !important;
-}
-
-/* TitleBar in Apple Light */
-[data-skin="light"] .titlebar-drag-region {
-  background-color: #ffffff !important;
-  border-bottom: 1px solid #e5e5ea !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
-}
-
-[data-skin="light"] .titlebar-drag-region span.text-slate-200 {
-  color: #1d1d1f !important;
-  font-weight: 700;
-}
-
-[data-skin="light"] .titlebar-drag-region .bg-slate-800\/80 {
-  background-color: #f2f2f7 !important;
-  color: #6e6e73 !important;
-  border: 1px solid #e5e5ea;
-}
-
-[data-skin="light"] .titlebar-no-drag button {
-  color: #6e6e73 !important;
-}
-
-[data-skin="light"] .titlebar-no-drag button:hover {
-  background-color: #f2f2f7 !important;
-  color: #1d1d1f !important;
-}
-
-[data-skin="light"] .titlebar-no-drag button:last-child:hover {
-  background-color: #ff3b30 !important;
+/* Apple Primary Button */
+[data-skin="light"] .btn-blue {
+  background: #0071e3 !important;
   color: #ffffff !important;
+  box-shadow: 0 3px 12px rgba(0, 113, 227, 0.28) !important;
 }
 
-/* Sidebar in Apple Light */
-[data-skin="light"] aside {
-  background-color: #f8f8fa !important;
-  border-right: 1px solid #e5e5ea !important;
+[data-skin="light"] .btn-blue:hover {
+  background: #0077ed !important;
 }
 
-[data-skin="light"] aside .text-slate-400 {
-  color: #6e6e73 !important;
+/* Control Center rows */
+[data-skin="light"] .cc-row {
+  border-bottom-color: #f2f2f7 !important;
 }
 
-[data-skin="light"] aside button.hover\:bg-slate-800\/50:hover {
-  background-color: #ececed !important;
-  color: #1d1d1f !important;
-}
+/* ==========================================================================
+   GENERIC OVERRIDES FOR HARDCODED DARK CLASSES
+   ========================================================================== */
 
-[data-skin="light"] aside .bg-slate-800\/60 {
-  background-color: #ffffff !important;
-  border: 1px solid #e5e5ea !important;
-  color: #1d1d1f !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-}
-
-[data-skin="light"] aside .bg-slate-800 {
-  background-color: #e5e5ea !important;
-  color: #1d1d1f !important;
-}
-
-[data-skin="light"] aside .bg-slate-900\/80 {
-  background-color: #ffffff !important;
-  border: 1px solid #e5e5ea !important;
-  color: #6e6e73 !important;
-}
-
-[data-skin="light"] aside .text-slate-300 {
-  color: #1d1d1f !important;
-}
-
-[data-skin="light"] aside .border-slate-800\/80,
-[data-skin="light"] aside .border-slate-800\/60,
-[data-skin="light"] aside .border-slate-800 {
-  border-color: #e5e5ea !important;
-}
-
-/* Main Workspace Area */
-[data-skin="light"] main {
-  background-color: #f5f5f7 !important;
-}
-
-/* Cards, Panels & Containers (Apple Floating Surfaces) */
+/* Dark Containers -> Clean Apple White / Light Gray */
+[data-skin="light"] .bg-\[\#0b0f19\],
+[data-skin="light"] .bg-\[\#070b14\],
+[data-skin="light"] .bg-\[\#0a0e17\],
+[data-skin="light"] .bg-\[\#14181d\],
 [data-skin="light"] .bg-slate-900\/60,
 [data-skin="light"] .bg-slate-900\/70,
 [data-skin="light"] .bg-slate-900\/80,
 [data-skin="light"] .bg-slate-900\/90,
 [data-skin="light"] .bg-slate-900 {
   background-color: #ffffff !important;
-  border: 1px solid #e5e5ea !important;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.02) !important;
+  border-color: #e5e5ea !important;
+  color: #1d1d1f !important;
 }
 
-[data-skin="light"] .hover\:border-slate-700:hover {
-  border-color: #d2d2d7 !important;
-  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
-}
-
-[data-skin="light"] .hover\:shadow-xl:hover {
-  box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.03) !important;
-}
-
-/* Nested subcards and dark backgrounds */
+/* Secondary Panels / Input Backgrounds / Sub-boxes */
 [data-skin="light"] .bg-slate-950,
 [data-skin="light"] .bg-slate-950\/40,
 [data-skin="light"] .bg-slate-950\/60,
-[data-skin="light"] .bg-slate-950\/80 {
+[data-skin="light"] .bg-slate-950\/80,
+[data-skin="light"] .bg-\[\#101418\],
+[data-skin="light"] .bg-\[\#181e25\] {
   background-color: #f9f9fb !important;
   border-color: #e5e5ea !important;
 }
 
-/* Secondary Buttons, Chips & Interactive Controls */
+/* Secondary Buttons & Chips (#242c36, slate-800) */
+[data-skin="light"] .bg-\[\#242c36\],
 [data-skin="light"] .bg-slate-800,
 [data-skin="light"] .bg-slate-800\/80,
 [data-skin="light"] .bg-slate-800\/60,
 [data-skin="light"] .bg-slate-800\/50,
 [data-skin="light"] .bg-slate-800\/40 {
-  background-color: #f2f2f7 !important;
-  border-color: #e5e5ea !important;
+  background-color: #e5e5ea !important;
+  border-color: #dcdce2 !important;
   color: #1d1d1f !important;
 }
 
+[data-skin="light"] .hover\:bg-\[\#2e3743\]:hover,
+[data-skin="light"] .hover\:bg-\[\#242c36\]:hover,
 [data-skin="light"] .hover\:bg-slate-800:hover,
 [data-skin="light"] .hover\:bg-slate-700:hover {
-  background-color: #e5e5ea !important;
+  background-color: #dcdce2 !important;
   color: #1d1d1f !important;
 }
 
-/* Typography Overrides for Apple Crispness */
+/* Hairline Borders */
+[data-skin="light"] .border-\[\#1e252e\],
+[data-skin="light"] .border-\[\#2b3441\],
+[data-skin="light"] .border-slate-800,
+[data-skin="light"] .border-slate-800\/90,
+[data-skin="light"] .border-slate-800\/80,
+[data-skin="light"] .border-slate-800\/60,
+[data-skin="light"] .border-slate-800\/50,
+[data-skin="light"] .border-slate-700,
+[data-skin="light"] .border-slate-700\/60,
+[data-skin="light"] .border-slate-700\/50,
+[data-skin="light"] .border-white\/5,
+[data-skin="light"] .border-white\/10 {
+  border-color: #e5e5ea !important;
+}
+
+/* Typography Overrides */
 [data-skin="light"] .text-slate-100,
-[data-skin="light"] .text-slate-200 {
+[data-skin="light"] .text-slate-200,
+[data-skin="light"] .text-\[\#e2e8f0\],
+[data-skin="light"] .text-\[\#f1f5f9\] {
   color: #1d1d1f !important;
 }
 
@@ -534,11 +500,13 @@ body[data-skin="light"] main {
   color: #333336 !important;
 }
 
-[data-skin="light"] .text-slate-400 {
+[data-skin="light"] .text-slate-400,
+[data-skin="light"] .text-\[\#8492a6\] {
   color: #6e6e73 !important;
 }
 
-[data-skin="light"] .text-slate-500 {
+[data-skin="light"] .text-slate-500,
+[data-skin="light"] .text-\[\#596778\] {
   color: #86868b !important;
 }
 
@@ -549,35 +517,18 @@ body[data-skin="light"] main {
 [data-skin="light"] h4.text-white,
 [data-skin="light"] div.font-mono.text-white,
 [data-skin="light"] span.font-mono.text-white,
-[data-skin="light"] .text-white:not(button):not(button *):not(.btn-primary):not(.btn-primary *):not(.badge-solid):not(.badge-solid *) {
+[data-skin="light"] .text-white:not(button):not(button *):not(.btn-primary):not(.btn-primary *):not(.btn-blue):not(.btn-blue *):not(.badge-solid):not(.badge-solid *):not(.bg-\[\#ff9f0a\] *):not(.bg-\[\#30d158\] *):not(.bg-\[\#ff453a\] *):not(.bg-\[\#0a84ff\] *):not(.bg-\[\#0071e3\] *) {
   color: #1d1d1f !important;
 }
 
-/* Ensure colored action buttons keep readable text */
-[data-skin="light"] button.bg-blue-600,
+/* Preserve White text on colored accent buttons & badges */
 [data-skin="light"] button.bg-blue-600 *,
-[data-skin="light"] button.bg-red-600,
 [data-skin="light"] button.bg-red-600 *,
-[data-skin="light"] .bg-blue-600 .text-white,
-[data-skin="light"] .bg-red-600 .text-white {
+[data-skin="light"] .bg-\[\#0a84ff\] *,
+[data-skin="light"] .bg-\[\#0071e3\] *,
+[data-skin="light"] .bg-emerald-500 *,
+[data-skin="light"] .bg-\[\#ff9f0a\] * {
   color: #ffffff !important;
-}
-
-[data-skin="light"] button.from-emerald-500,
-[data-skin="light"] button.from-emerald-500 *,
-[data-skin="light"] button.bg-emerald-500,
-[data-skin="light"] button.bg-emerald-500 * {
-  color: #042f2e !important;
-}
-
-/* Code tags in Apple Light */
-[data-skin="light"] code {
-  background-color: #f2f2f7;
-  color: #1d1d1f;
-  padding: 1px 5px;
-  border-radius: 4px;
-  border: 1px solid #e5e5ea;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 /* Form Inputs, Selects & Textareas (Apple Minimal Inputs) */
@@ -588,7 +539,7 @@ body[data-skin="light"] main {
   border: 1px solid #d2d2d7 !important;
   color: #1d1d1f !important;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
 }
 
 [data-skin="light"] input::placeholder,
@@ -603,53 +554,44 @@ body[data-skin="light"] main {
   box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15) !important;
 }
 
-/* Hairline Borders */
-[data-skin="light"] .border-slate-800,
-[data-skin="light"] .border-slate-800\/90,
-[data-skin="light"] .border-slate-800\/80,
-[data-skin="light"] .border-slate-800\/60,
-[data-skin="light"] .border-slate-800\/50,
-[data-skin="light"] .border-slate-700,
-[data-skin="light"] .border-slate-700\/60,
-[data-skin="light"] .border-slate-700\/50 {
-  border-color: #e5e5ea !important;
+/* Code tags */
+[data-skin="light"] code {
+  background-color: #f2f2f7;
+  color: #1d1d1f;
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 1px solid #e5e5ea;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-/* Modals & Dialogs in Light Mode */
+/* Modals & Backdrop Blur */
 [data-skin="light"] .fixed.inset-0.bg-black\/80 {
-  background-color: rgba(0, 0, 0, 0.35) !important;
-  backdrop-filter: blur(14px) !important;
+  background-color: rgba(0, 0, 0, 0.28) !important;
+  backdrop-filter: blur(16px) !important;
 }
 
-[data-skin="light"] .fixed.inset-0 .bg-slate-900 {
-  background-color: #ffffff !important;
-  border: 1px solid #e5e5ea !important;
-  box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.04) !important;
-}
-
-/* Pipeline Console Terminal (Apple Xcode / macOS Terminal Style) */
-[data-skin="light"] .lg\:col-span-8.bg-\[\#070a12\] {
-  background-color: #141721 !important;
+/* Terminal Console (macOS Terminal Style) */
+[data-skin="light"] .lg\:col-span-8.bg-\[\#070a12\],
+[data-skin="light"] .bg-\[\#0e1115\] {
+  background-color: #161a22 !important;
   border: 1px solid #d2d2d7 !important;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08) !important;
 }
 
-[data-skin="light"] .lg\:col-span-8.bg-\[\#070a12\] .bg-slate-900\/90 {
-  background-color: #1e2230 !important;
-  border-bottom: 1px solid #2d3345 !important;
+[data-skin="light"] .bg-\[\#0e1115\] * {
+  color: #f1f5f9;
 }
 
-[data-skin="light"] .lg\:col-span-8.bg-\[\#070a12\] .text-slate-300 {
-  color: #f1f5f9 !important;
+[data-skin="light"] .bg-\[\#0e1115\] .text-\[\#30d158\] {
+  color: #30d158 !important;
 }
 
-[data-skin="light"] .lg\:col-span-8.bg-\[\#070a12\] .bg-slate-800 {
-  background-color: #2b3145 !important;
-  color: #94a3b8 !important;
+[data-skin="light"] .bg-\[\#0e1115\] .text-\[\#ff453a\] {
+  color: #ff453a !important;
 }
 
-[data-skin="light"] .lg\:col-span-8.bg-\[\#070a12\] .text-slate-400 {
-  color: #94a3b8 !important;
+[data-skin="light"] .bg-\[\#0e1115\] .text-\[\#0a84ff\] {
+  color: #0a84ff !important;
 }
 
 /* Apple Light Scrollbars */
@@ -664,3 +606,4 @@ body[data-skin="light"] main {
 [data-skin="light"] ::-webkit-scrollbar-thumb:hover {
   background: #aeaeb2 !important;
 }
+
