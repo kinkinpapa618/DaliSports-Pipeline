@@ -1,17 +1,19 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "releaseDate": "2026-09-08",
-  "title": "DaliSports Studio v1.1.0",
-  "minAppVersion": "1.0.0",
+  "title": "DaliSports Studio v1.2.0",
+  "minAppVersion": "1.1.0",
   "mandatory": false,
   "releaseNotes": [
-    "Thêm Skin 'Apple Light' phong cách tối giản, thanh lịch, chuẩn mực Clean & Basic.",
-    "Bổ sung chức năng Kiểm tra và Cập nhật phiên bản mới (App Updates).",
-    "Nâng cấp thuật toán nhận diện và bóc tách bảng điểm Gemini 2.5 Flash.",
-    "Cải thiện độ ổn định và tốc độ cắt video highlight đa luồng FFmpeg.",
-    "Tối ưu hóa giao diện chỉnh sửa scoreboard timeline và xem trước SEO."
+    "Pipeline Console đổi thành thanh Processes: 4 bước Download/Timeline/Cut/Upload hiển thị tiến độ theo thời gian thực, chỉ thông báo quan trọng.",
+    "Pipeline 4 bước chạy tuần tự hoặc độc lập hoàn toàn (--skip-download/--skip-timeline/--skip-cut/--skip-upload, platform youtube/facebook/both).",
+    "Cắt clip tôn trọng lựa chọn Timeline Editor (selected), import video trực tiếp (file picker) + Agent trích xuất giải đấu từ link.",
+    "Chuẩn hóa + sinh Chapters YouTube độc lập (/api/chapters/preview, /api/timeline/generate|normalize) và hiển thị trong description.",
+    "Cấu hình tác vụ mobile-optimized: sticky header, 44px touch target, pill platform, collapsible nâng cao, 1 cột mobile.",
+    "Tunnel đổi stu.trongtaiso.com → server.trongtaiso.com, Cloudflare quick tunnel + .env CLOUDFLARE_CUSTOM_DOMAIN.",
+    "Build prod vite 6 + electron 34.5.8, bản portable/win-unpacked 190MB."
   ],
   "downloadUrl": "https://github.com/kinkinpapa618/DaliSports-Pipeline/releases/latest",
   "changelogUrl": "https://github.com/kinkinpapa618/DaliSports-Pipeline/releases",
-  "packageSize": "85 MB"
+  "packageSize": "88 MB"
 }
