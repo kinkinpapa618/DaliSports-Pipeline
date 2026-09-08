@@ -49,8 +49,15 @@ export interface PipelineOptions {
   tournamentName?: string;
   sponsor?: string;
   category?: string;
+  // 4 bước có thể chạy tuần tự hoặc độc lập
+  skipDownload?: boolean;
+  skipTimeline?: boolean;
+  skipNormalize?: boolean;
   skipCut?: boolean;
+  skipUpload?: boolean;
   dryRun?: boolean;
+  // Platform & mode
+  platform?: 'youtube' | 'facebook' | 'both';
   ytMode?: 'source' | 'clips' | 'both';
   enableFb?: boolean;
   enableYt?: boolean;

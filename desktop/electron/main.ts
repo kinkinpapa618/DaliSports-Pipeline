@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, ipcMain, shell, dialog } from 'electron';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -148,6 +148,69 @@ function registerIpcHandlers() {
     if (url) {
       shell.openExternal(url);
     }
+  });
+
+  // 1) Download / Import video trực tiếp (chọn file mp4)
+  ipcMain.handle('video:importFile', async (_, tournamentPath: string) => {
+    const res = await dialog.showOpenDialog(mainWindow!, {
+      properties: ['openFile'],
+      filters: [{ name: 'Video', extensions: ['mp4','mkv','mov','avi','ts'] }],
+      title: 'Chọn file video nguồn để import trực tiếp',
+    });
+    if (res.canceled || !res.filePaths[0]) return { success: false, error: 'Đã hủy chọn file' };
+    return tournamentService.importVideoFile(tournamentPath, res.filePaths[0]);
+  });
+
+  // Import with explicit source path (for programmatic)
+  ipcMain.handle('video:importFilePath', async (_, tournamentPath: string, sourcePath: string) => {
+    return tournamentService.importVideoFile(tournamentPath, sourcePath);
+  });
+
+  // 2) Get timeline độc lập (chạy Gemini AI quét banner scoreboard)
+  ipcMain.handle('timeline:generate', async (_, tournamentPath: string) => {
+    const { spawn } = await import('child_process');
+    const script = path.join(WORKSPACE_ROOT, 'system', 'gemini_timeline.py');
+    // Find video file
+    const videoDir = path.join(tournamentPath, 'video');
+    let videoPath = '';
+    if (fs.existsSync(videoDir)) {
+      const vids = fs.readdirSync(videoDir).filter(f => /\.(mp4|mkv|mov)$/i.test(f));
+      if (vids.length) videoPath = path.join(videoDir, vids[0]);
+    }
+    if (!videoPath) return { success: false, error: 'Chưa có file video trong thư mục giải' };
+    return new Promise(resolve => {
+      const proc = spawn('python', ['-u', script, videoPath], { cwd: WORKSPACE_ROOT });
+      let out = '', err = '';
+      proc.stdout.on('data', d => out += d.toString());
+      proc.stderr.on('data', d => err += d.toString());
+      proc.on('close', code => resolve({ success: code === 0, output: out + err }));
+    });
+  });
+
+  // 2b) Chuẩn hóa timeline + sinh chapters (độc lập)
+  ipcMain.handle('timeline:normalize', async (_, tournamentPath: string) => {
+    const script = path.join(WORKSPACE_ROOT, 'system', 'normalize.py');
+    // auto-detect timeline txt
+    const tlCandidates = fs.readdirSync(tournamentPath).filter(f => f.includes('timeline') && f.endsWith('.txt') && !f.includes('norms'));
+    const tl = tlCandidates[0] ? path.join(tournamentPath, tlCandidates[0]) : '';
+    return new Promise(resolve => {
+      const proc = spawn('python', ['-u', script, tl], { cwd: WORKSPACE_ROOT });
+      let out = '', err = '';
+      proc.stdout.on('data', d => out += d.toString());
+      proc.stderr.on('data', d => err += d.toString());
+      proc.on('close', code => resolve({ success: code === 0, output: out + err }));
+    });
+  });
+
+  ipcMain.handle('chapters:preview', async (_, tournamentPath: string) => {
+    try {
+      // Dynamically import python logic via child process using upload_source_youtube dry-run
+      const proc = spawn('python', ['-u', path.join(WORKSPACE_ROOT, 'system', 'upload_source_youtube.py'), path.join(tournamentPath, 'video', 'dummy.mp4'), '--dry-run'], { cwd: WORKSPACE_ROOT });
+      let out = '';
+      proc.stdout.on('data', d => out += d.toString());
+      await new Promise(res => proc.on('close', res));
+      return { chapters: out };
+    } catch (e: any) { return { error: e.message }; }
   });
 
   // Timeline

@@ -359,6 +359,23 @@ export class TournamentService {
     }
   }
 
+  public importVideoFile(tournamentPath: string, sourceVideoPath: string): { success: boolean; dest?: string; error?: string } {
+    try {
+      if (!fs.existsSync(tournamentPath)) return { success: false, error: 'Giải đấu không tồn tại.' };
+      if (!fs.existsSync(sourceVideoPath)) return { success: false, error: 'File video nguồn không tồn tại.' };
+      const videoDir = path.join(tournamentPath, 'video');
+      fs.mkdirSync(videoDir, { recursive: true });
+      const dest = path.join(videoDir, path.basename(sourceVideoPath));
+      // Avoid overwriting if same file
+      if (path.resolve(sourceVideoPath) !== path.resolve(dest)) {
+        fs.copyFileSync(sourceVideoPath, dest);
+      }
+      return { success: true, dest };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  }
+
   public updateTournament(
     tournamentPath: string,
     updates: {

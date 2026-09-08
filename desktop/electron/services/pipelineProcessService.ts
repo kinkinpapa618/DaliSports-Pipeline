@@ -48,11 +48,24 @@ export class PipelineProcessService {
     if (options.category && options.category.trim().length > 0) {
       args.push('--category', options.category.trim());
     }
+    // 4 bước độc lập: download / timeline / cut / upload có thể skip riêng
+    if (options.skipDownload) {
+      args.push('--skip-download');
+    }
+    if (options.skipTimeline) {
+      args.push('--skip-timeline');
+    }
     if (options.skipCut) {
       args.push('--skip-cut');
     }
+    if (options.skipUpload) {
+      args.push('--skip-upload');
+    }
     if (options.dryRun) {
       args.push('--dry-run');
+    }
+    if (options.platform) {
+      args.push('--platform', options.platform);
     }
     if (options.ytMode) {
       args.push('--yt-mode', options.ytMode);

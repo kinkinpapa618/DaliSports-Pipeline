@@ -84,14 +84,52 @@ def main():
     os.makedirs(out_dir, exist_ok=True)
 
     rows = []
+    # 1. Thử đọc timeline.json cùng thư mục video để honor flag selected
+    json_path = None
+    # Ưu tiên timeline.json trong video_dir, rồi parent (tournament)
+    for cand_dir in [video_dir, os.path.dirname(video_dir)]:
+        cand = os.path.join(cand_dir, "timeline.json")
+        if os.path.exists(cand):
+            json_path = cand
+            break
+    selected_filter = None
+    if json_path:
+        try:
+            import json as _json
+            with open(json_path, "r", encoding="utf-8") as jf:
+                jdata = _json.load(jf)
+                jlist = jdata if isinstance(jdata, list) else jdata.get("matches", [])
+                # Build set of selected start_time normalized
+                sel = []
+                for m in jlist:
+                    if m.get("selected", True) is not False:
+                        sel.append((str(m.get("start_time","")).strip(), str(m.get("end_time","")).strip()))
+                if sel and len(sel) != len(jlist):
+                    selected_filter = set(sel)
+                    print(f"[*] Phát hiện timeline.json với {len(jlist)} trận, chỉ cắt {len(sel)} trận được chọn (selected=true)")
+        except Exception as e:
+            print(f"[!] Không đọc được timeline.json để lọc selected: {e}")
+
+    def _norm_time(t: str) -> str:
+        t = t.strip()
+        if len(t.split(":")) == 2:
+            return "00:" + t
+        return t
+
     with open(timeline, encoding="utf-8-sig") as f:
         for line in f:
             m = TL_RE.match(line)
             if m:
-                rows.append((m.group(1), m.group(2), m.group(3)))
+                s, e, title = m.group(1), m.group(2), m.group(3)
+                if selected_filter is not None:
+                    key = (_norm_time(s), _norm_time(e))
+                    if key not in selected_filter:
+                        print(f"  [SKIP] Bỏ qua trận không được chọn: {s} - {e} | {title[:60]}")
+                        continue
+                rows.append((s, e, title))
 
     if not rows:
-        print("[!] Timeline trống / sai định dạng."); return
+        print("[!] Timeline trống / sai định dạng hoặc không có trận nào được chọn."); return
 
     info_path = os.path.join(out_dir, "clips_info.txt")
     with open(info_path, "w", encoding="utf-8") as info:

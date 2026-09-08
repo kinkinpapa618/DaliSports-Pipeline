@@ -40,7 +40,13 @@
       "dist-electron/**/*"
     ]
   },
-  "keywords": ["dalisports", "electron", "react", "sports-video", "pipeline"],
+  "keywords": [
+    "dalisports",
+    "electron",
+    "react",
+    "sports-video",
+    "pipeline"
+  ],
   "author": "Hữu Mạnh - BMB <huumanh.info@aol.com>",
   "license": "ISC",
   "dependencies": {
@@ -64,5 +70,9 @@
     "vite": "^6.2.0",
     "vite-plugin-electron": "^0.29.0",
     "vite-plugin-electron-renderer": "^0.14.6"
+  },
+  "allowScripts": {
+    "electron@34.5.8": true,
+    "esbuild@0.25.12": true
   }
 }

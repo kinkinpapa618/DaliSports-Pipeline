@@ -127,7 +127,7 @@ class WebApiAdapter {
     }
   }
 
-  // --- Timeline ---
+  // --- Timeline (độc lập: get / save / generate / normalize) ---
   async getTimeline(tournamentPath: string): Promise<{ matches: MatchTimelineItem[]; rawJson?: any; detectedFile?: string }> {
     const res = await fetch(`${this.getBaseUrl()}/api/timeline?path=${encodeURIComponent(tournamentPath)}`);
     if (!res.ok) throw new Error(`HTTP error ${res.status}`);
@@ -142,6 +142,57 @@ class WebApiAdapter {
     });
     const data = await res.json();
     return Boolean(data.success);
+  }
+
+  async generateTimeline(tournamentPath: string): Promise<any> {
+    const res = await fetch(`${this.getBaseUrl()}/api/timeline/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tournamentPath }),
+    });
+    return await res.json();
+  }
+
+  async normalizeTimeline(tournamentPath: string): Promise<any> {
+    const res = await fetch(`${this.getBaseUrl()}/api/timeline/normalize`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tournamentPath }),
+    });
+    return await res.json();
+  }
+
+  async previewChapters(tournamentPath: string): Promise<{ title: string; description: string; chapters: string[] }> {
+    const res = await fetch(`${this.getBaseUrl()}/api/chapters/preview?path=${encodeURIComponent(tournamentPath)}`);
+    if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+    return await res.json();
+  }
+
+  async importVideoFile(tournamentPath: string, file: File): Promise<any> {
+    const form = new FormData();
+    form.append('file', file);
+    const res = await fetch(`${this.getBaseUrl()}/api/video/import?tournamentPath=${encodeURIComponent(tournamentPath)}`, {
+      method: 'POST',
+      body: form,
+    });
+    return await res.json();
+  }
+
+  // Electron-compatible import (file picker)
+  async importVideoFileDialog(tournamentPath: string): Promise<any> {
+    // Fallback: trigger hidden input for web mode
+    return new Promise((resolve) => {
+      const inp = document.createElement('input');
+      inp.type = 'file';
+      inp.accept = 'video/mp4,video/*,.mp4,.mkv,.mov,.avi,.ts';
+      inp.onchange = async () => {
+        const file = inp.files?.[0];
+        if (!file) return resolve({ success: false });
+        const r = await this.importVideoFile(tournamentPath, file);
+        resolve(r);
+      };
+      inp.click();
+    });
   }
 
   // --- Pipeline Execution ---

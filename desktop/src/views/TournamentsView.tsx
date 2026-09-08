@@ -301,6 +301,50 @@ export const TournamentsView: React.FC<TournamentsViewProps> = ({
     }
   };
 
+  const [importingId, setImportingId] = useState<string | null>(null);
+
+  const handleImportVideo = async (t: TournamentInfo) => {
+    try {
+      setImportingId(t.id);
+      // Electron mode: native dialog
+      if ((window as any).api?.importVideoFile) {
+        const res = await (window as any).api.importVideoFile(t.path);
+        if (res?.success) {
+          onRefresh();
+        } else if (res?.error) {
+          alert(res.error);
+        }
+      } else if ((window as any).api?.importVideoFileDialog) {
+        // Web remote mode
+        const res = await (window as any).api.importVideoFileDialog(t.path);
+        if (res?.success) onRefresh();
+      } else {
+        // Fallback hidden input for web remote
+        const inp = document.createElement('input');
+        inp.type = 'file';
+        inp.accept = 'video/mp4,video/*,.mp4,.mkv,.mov,.avi,.ts';
+        inp.onchange = async () => {
+          const file = inp.files?.[0];
+          if (!file) { setImportingId(null); return; }
+          const form = new FormData();
+          form.append('file', file);
+          const resp = await fetch(`/api/video/import?tournamentPath=${encodeURIComponent(t.path)}`, { method: 'POST', body: form });
+          const data = await resp.json();
+          if (data.success) onRefresh();
+          else alert(data.error || 'Import thất bại');
+          setImportingId(null);
+        };
+        inp.click();
+        // Don't reset immediately, wait for onchange
+        return;
+      }
+    } catch (e: any) {
+      alert(e.message || 'Import lỗi');
+    } finally {
+      setImportingId(null);
+    }
+  };
+
   const openFolder = (path: string) => {
     window.api?.openFolder(path);
   };
@@ -550,12 +594,27 @@ export const TournamentsView: React.FC<TournamentsViewProps> = ({
               </div>
             </div>
 
-            {/* Actions: CHẠY FULL - TIMELINE - Y-UPLOAD */}
+            {/* Import trực tiếp (1) - độc lập */}
+            <div className="flex gap-1.5">
+              <button
+                onClick={() => handleImportVideo(t)}
+                disabled={importingId === t.id}
+                className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-full bg-[#30d158]/10 hover:bg-[#30d158]/20 border border-[#30d158]/25 text-[#30d158] text-[11px] font-bold transition-colors disabled:opacity-50"
+                title="Import file video trực tiếp vào giải (bước 1 độc lập)"
+              >
+                <UploadCloud className="w-3 h-3 shrink-0" />
+                <span>{t.hasVideo ? 'Đổi Video' : 'Import Video'}</span>
+                {importingId === t.id && <Loader2 className="w-3 h-3 animate-spin" />}
+              </button>
+              <span className="text-[10px] px-2 py-1 rounded-full bg-slate-800 text-slate-400 font-mono self-center border border-white/5">Bước 1</span>
+            </div>
+
+            {/* Actions: CHẠY FULL - TIMELINE - Y-UPLOAD (bước 2-4) */}
             <div className="grid grid-cols-3 gap-1.5 sm:gap-2 pt-1">
               <button
                 onClick={() => onSelectTournamentForPipeline(t)}
                 className="flex items-center justify-center gap-1 py-2 px-1 rounded-full bg-[#0a84ff] hover:bg-[#0071e3] text-white text-[11px] sm:text-xs font-bold transition-all shadow-md shadow-[#0a84ff]/20 cursor-pointer"
-                title="Khởi chạy toàn bộ pipeline (cắt clip và xuất bản)"
+                title="Khởi chạy toàn bộ pipeline (cắt clip và xuất bản) - tuần tự 4 bước"
               >
                 <Play className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current shrink-0" />
                 <span className="truncate">CHẠY FULL</span>

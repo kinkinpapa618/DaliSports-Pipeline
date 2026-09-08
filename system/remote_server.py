@@ -189,7 +189,7 @@ async def get_tunnel_status():
     active = state.tunnel_proc is not None and state.tunnel_proc.poll() is None and state.tunnel_url is not None
     url = state.tunnel_url
     if not url:
-        custom_domain = os.environ.get("CLOUDFLARE_CUSTOM_DOMAIN", "stu.trongtaiso.com").strip()
+        custom_domain = os.environ.get("CLOUDFLARE_CUSTOM_DOMAIN", "server.trongtaiso.com").strip()
         if custom_domain:
             url = f"https://{custom_domain}" if not custom_domain.startswith("http") else custom_domain
             active = True
@@ -536,10 +536,19 @@ async def start_pipeline(options: Dict[str, Any] = Body(...)):
         args.extend(["--sponsor", options["sponsor"].strip()])
     if options.get("category"):
         args.extend(["--category", options["category"].strip()])
+    # 4 bước có thể chạy độc lập: cho phép skip từng bước
+    if options.get("skipDownload"):
+        args.append("--skip-download")
+    if options.get("skipTimeline"):
+        args.append("--skip-timeline")
     if options.get("skipCut"):
         args.append("--skip-cut")
+    if options.get("skipUpload"):
+        args.append("--skip-upload")
     if options.get("dryRun"):
         args.append("--dry-run")
+    if options.get("platform"):
+        args.extend(["--platform", options["platform"]])
     if options.get("ytMode"):
         args.extend(["--yt-mode", options["ytMode"]])
 
@@ -596,6 +605,107 @@ async def kill_pipeline():
             pass
         return {"success": True}
     return {"success": False}
+
+# ============================================================
+# Video Import trực tiếp (file upload) + Timeline độc lập + Chapters
+# ============================================================
+
+from fastapi import UploadFile, File
+
+@app.post("/api/video/import")
+async def import_video_file(tournamentPath: str = Query(...), file: UploadFile = File(...)):
+    """Upload file mp4 trực tiếp vào thư mục video của giải (độc lập, không cần link)"""
+    if not tournamentPath or not os.path.exists(tournamentPath):
+        raise HTTPException(status_code=404, detail="Tournament path not found")
+    video_dir = os.path.join(tournamentPath, "video")
+    os.makedirs(video_dir, exist_ok=True)
+    dest = os.path.join(video_dir, file.filename or "source.mp4")
+    try:
+        content = await file.read()
+        with open(dest, "wb") as f:
+            f.write(content)
+        return {"success": True, "path": dest, "filename": os.path.basename(dest), "size": len(content)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/timeline/generate")
+async def generate_timeline_api(payload: Dict[str, Any] = Body(...)):
+    """Bước 2 độc lập: chạy Gemini Timeline quét banner scoreboard"""
+    t_path = payload.get("tournamentPath", "")
+    if not t_path or not os.path.exists(t_path):
+        raise HTTPException(status_code=404, detail="Tournament not found")
+    video_dir = os.path.join(t_path, "video")
+    video_path = None
+    if os.path.exists(video_dir):
+        vids = [f for f in os.listdir(video_dir) if re.search(r"\.(mp4|mkv|mov)$", f, re.I)]
+        if vids:
+            video_path = os.path.join(video_dir, vids[0])
+    if not video_path:
+        return {"success": False, "error": "Chưa có video trong thư mục giải"}
+    script = os.path.join(WORKSPACE_ROOT, "system", "gemini_timeline.py")
+    proc = await asyncio.create_subprocess_exec(sys.executable, "-u", script, video_path, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, cwd=WORKSPACE_ROOT)
+    stdout, stderr = await proc.communicate()
+    return {"success": proc.returncode == 0, "output": (stdout.decode(errors="ignore") + stderr.decode(errors="ignore"))[-4000:]}
+
+@app.post("/api/timeline/normalize")
+async def normalize_timeline_api(payload: Dict[str, Any] = Body(...)):
+    """Bước 2b độc lập: chuẩn hóa dữ liệu timeline"""
+    t_path = payload.get("tournamentPath", "")
+    if not t_path or not os.path.exists(t_path):
+        raise HTTPException(status_code=404, detail="Tournament not found")
+    # Tìm timeline txt
+    tl = None
+    for f in os.listdir(t_path):
+        if "timeline" in f and f.endswith(".txt") and "norms" not in f:
+            tl = os.path.join(t_path, f)
+            break
+    if not tl:
+        # fallback: tìm trong video subfolder
+        for root, _, files in os.walk(t_path):
+            for f in files:
+                if "timeline" in f and f.endswith(".txt") and "norms" not in f:
+                    tl = os.path.join(root, f)
+                    break
+    if not tl:
+        return {"success": False, "error": "Không tìm thấy timeline txt"}
+    script = os.path.join(WORKSPACE_ROOT, "system", "normalize.py")
+    proc = await asyncio.create_subprocess_exec(sys.executable, "-u", script, tl, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, cwd=WORKSPACE_ROOT)
+    stdout, stderr = await proc.communicate()
+    return {"success": proc.returncode == 0, "output": (stdout.decode(errors="ignore") + stderr.decode(errors="ignore"))[-4000:]}
+
+@app.get("/api/chapters/preview")
+async def chapters_preview(path: str = Query(...)):
+    """Sinh chapters để chèn vào description YouTube (độc lập)"""
+    # Tìm norms hoặc timeline json
+    video_path = ""
+    norms_path = None
+    # tìm video
+    vdir = os.path.join(path, "video")
+    if os.path.exists(vdir):
+        vids = [f for f in os.listdir(vdir) if f.endswith(".mp4")]
+        if vids: video_path = os.path.join(vdir, vids[0])
+    # tìm norms
+    for cand in [os.path.join(path, f) for f in os.listdir(path) if "norms" in f] if os.path.exists(path) else []:
+        norms_path = cand
+        break
+    try:
+        # reuse logic from upload_source_youtube
+        import importlib.util as _ilu
+        spec = _ilu.spec_from_file_location("upload_src", os.path.join(WORKSPACE_ROOT, "system", "upload_source_youtube.py"))
+        mod = _ilu.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        title, description = mod.build_youtube_chapters_and_title(video_path or path, norms_path)
+        # Parse chapters block
+        chapters = []
+        for line in description.splitlines():
+            if re.match(r"^\d{2}:\d{2}:\d{2}\s", line) or "Trận" in line and re.match(r"^\d", line):
+                chapters.append(line)
+        # Also extract via regex 00:00:00
+        if not chapters:
+            chapters = re.findall(r"\d{2}:\d{2}:\d{2}[^\n]*", description)
+        return {"title": title, "description": description, "chapters": chapters or description.splitlines()[:20]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # ============================================================
 # SEO Preview & Config

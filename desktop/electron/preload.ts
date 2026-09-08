@@ -17,6 +17,13 @@ contextBridge.exposeInMainWorld('api', {
     ipcRenderer.invoke('timeline:get', tournamentPath),
   saveTimeline: (tournamentPath: string, matches: MatchTimelineItem[]): Promise<boolean> => 
     ipcRenderer.invoke('timeline:save', tournamentPath, matches),
+  generateTimeline: (tournamentPath: string): Promise<any> => ipcRenderer.invoke('timeline:generate', tournamentPath),
+  normalizeTimeline: (tournamentPath: string): Promise<any> => ipcRenderer.invoke('timeline:normalize', tournamentPath),
+  previewChapters: (tournamentPath: string): Promise<any> => ipcRenderer.invoke('chapters:preview', tournamentPath),
+
+  // Download / Import trực tiếp
+  importVideoFile: (tournamentPath: string): Promise<any> => ipcRenderer.invoke('video:importFile', tournamentPath),
+  importVideoFilePath: (tournamentPath: string, sourcePath: string): Promise<any> => ipcRenderer.invoke('video:importFilePath', tournamentPath, sourcePath),
 
   // Pipeline
   startPipeline: (options: PipelineOptions): Promise<boolean> => ipcRenderer.invoke('pipeline:start', options),
