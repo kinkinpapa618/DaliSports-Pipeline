@@ -220,15 +220,15 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col p-6 space-y-5 overflow-y-auto">
+    <div className="h-full flex flex-col p-3 sm:p-6 space-y-3.5 sm:space-y-5 overflow-y-auto">
       {/* Header */}
-      <div className="apple-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="cc-icon blue !w-10 !h-10 !rounded-xl text-white">
-            <Settings className="w-5 h-5" />
+      <div className="apple-card p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="cc-icon blue !w-9 !h-9 sm:!w-10 sm:!h-10 !rounded-xl text-white shrink-0">
+            <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-[var(--text-main)]">Cài Đặt Hệ Thống & Cấu Hình .ENV</h1>
+            <h1 className="text-base sm:text-lg font-bold text-[var(--text-main)]">Cài Đặt Hệ Thống & Cấu Hình .ENV</h1>
             <p className="text-xs text-[var(--text-muted)]">
               Quản lý API Key Google Gemini, chứng thực Facebook Fanpage, YouTube OAuth và các tham số pipeline
             </p>

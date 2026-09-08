@@ -95,15 +95,15 @@ export const SeoPreviewView: React.FC<SeoPreviewViewProps> = ({
   const tagsList = Array.isArray(seoResult?.tags) ? seoResult.tags : [];
 
   return (
-    <div className="h-full flex flex-col p-6 space-y-5 overflow-y-auto">
+    <div className="h-full flex flex-col p-3 sm:p-6 space-y-3.5 sm:space-y-5 overflow-y-auto">
       {/* Header */}
-      <div className="apple-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="cc-icon orange !w-10 !h-10 !rounded-xl text-white">
-            <Share2 className="w-5 h-5" />
+      <div className="apple-card p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="cc-icon orange !w-9 !h-9 sm:!w-10 sm:!h-10 !rounded-xl text-white shrink-0">
+            <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-[var(--text-main)]">Soạn Thảo & Xem Trước SEO Meta Data</h1>
+            <h1 className="text-base sm:text-lg font-bold text-[var(--text-main)]">Soạn Thảo & Xem Trước SEO</h1>
             <p className="text-xs text-[var(--text-muted)]">
               Tối ưu hóa tiêu đề, mô tả và thẻ tags đạt chuẩn thuật toán đề xuất của YouTube & Facebook Video
             </p>
@@ -112,7 +112,7 @@ export const SeoPreviewView: React.FC<SeoPreviewViewProps> = ({
 
         {/* Tournament Switcher */}
         {tournaments.length > 0 && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
             <Trophy className="w-4 h-4 text-[var(--accent-blue)] shrink-0" />
             <select
               value={activeTournament?.path || ''}
@@ -124,7 +124,7 @@ export const SeoPreviewView: React.FC<SeoPreviewViewProps> = ({
                   setSport(t.sportType === 'pickleball' ? 'Pickleball' : 'CauLong');
                 }
               }}
-              className="px-3.5 py-1.5 rounded-full bg-[var(--bg-input)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-blue)] shadow-sm"
+              className="w-full sm:w-auto px-3.5 py-1.5 rounded-full bg-[var(--bg-input)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:outline-none focus:border-[var(--accent-blue)] shadow-sm"
             >
               {tournaments.map((t) => (
                 <option key={t.id} value={t.path}>

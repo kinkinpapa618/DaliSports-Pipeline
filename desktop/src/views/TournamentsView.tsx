@@ -306,21 +306,21 @@ export const TournamentsView: React.FC<TournamentsViewProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col p-6 space-y-6 overflow-y-auto">
+    <div className="h-full flex flex-col p-3 sm:p-6 space-y-4 sm:space-y-6 overflow-y-auto">
       {/* Header & Stats */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-[var(--text-main)] flex items-center gap-3">
-            <Trophy className="w-7 h-7 text-[var(--accent-blue)]" />
-            <span>Quản Lý Giải Đấu & Video Trực Tiếp</span>
+          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-[var(--text-main)] flex items-center gap-2.5 sm:gap-3">
+            <Trophy className="w-6 h-6 sm:w-7 sm:h-7 text-[var(--accent-blue)] shrink-0" />
+            <span>Quản Lý Giải Đấu & Video</span>
           </h1>
-          <p className="text-xs text-[var(--text-muted)] mt-1">
+          <p className="text-xs text-[var(--text-muted)] mt-0.5 sm:mt-1">
             Theo dõi video nguồn, tệp timeline bóc tách tỷ số AI, clips cắt highlight và lịch sử tải lên
           </p>
         </div>
 
         {/* NÚT NHẬP LINK VIDEO & QUICK REFRESH */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2 sm:gap-2.5">
           <button
             onClick={() => {
               setShowModal(true);
@@ -329,7 +329,7 @@ export const TournamentsView: React.FC<TournamentsViewProps> = ({
               setExtractedData(null);
               setCreatedResult(null);
             }}
-            className="btn-blue cursor-pointer"
+            className="btn-blue cursor-pointer flex-1 sm:flex-none justify-center"
           >
             <Link2 className="w-4 h-4" />
             <span>Nhập Link Video</span>
@@ -340,7 +340,7 @@ export const TournamentsView: React.FC<TournamentsViewProps> = ({
 
           <button
             onClick={onRefresh}
-            className="circle-btn !w-9 !h-9"
+            className="circle-btn !w-9 !h-9 shrink-0"
             title="Làm mới danh sách giải đấu"
           >
             <RefreshCw className="w-4 h-4" />
@@ -349,50 +349,50 @@ export const TournamentsView: React.FC<TournamentsViewProps> = ({
       </div>
 
       {/* Metrics Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <div className="apple-card p-4 flex items-center gap-4">
-          <div className="cc-icon blue !w-10 !h-10 !rounded-xl text-white">
-            <Trophy className="w-5 h-5" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4">
+        <div className="apple-card p-3 sm:p-4 flex items-center gap-2.5 sm:gap-4">
+          <div className="cc-icon blue !w-9 !h-9 sm:!w-10 sm:!h-10 !rounded-xl text-white shrink-0">
+            <Trophy className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <div>
-            <div className="text-[11px] text-[var(--text-muted)] font-medium">Tổng Giải Đấu</div>
-            <div className="text-xl font-bold text-[var(--text-main)] font-mono">{tournaments.length}</div>
-          </div>
-        </div>
-
-        <div className="apple-card p-4 flex items-center gap-4">
-          <div className="cc-icon blue !w-10 !h-10 !rounded-xl text-white">
-            <Video className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="text-[11px] text-[var(--text-muted)] font-medium">Video Nguồn Có Sẵn</div>
-            <div className="text-xl font-bold text-[var(--text-main)] font-mono">{totalVideos}</div>
+          <div className="min-w-0">
+            <div className="text-[10px] sm:text-[11px] text-[var(--text-muted)] font-medium truncate">Tổng Giải Đấu</div>
+            <div className="text-lg sm:text-xl font-bold text-[var(--text-main)] font-mono">{tournaments.length}</div>
           </div>
         </div>
 
-        <div className="apple-card p-4 flex items-center gap-4">
-          <div className="cc-icon orange !w-10 !h-10 !rounded-xl text-white">
-            <Clock className="w-5 h-5" />
+        <div className="apple-card p-3 sm:p-4 flex items-center gap-2.5 sm:gap-4">
+          <div className="cc-icon blue !w-9 !h-9 sm:!w-10 sm:!h-10 !rounded-xl text-white shrink-0">
+            <Video className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <div>
-            <div className="text-[11px] text-[var(--text-muted)] font-medium">Trận Đấu Gemini AI</div>
-            <div className="text-xl font-bold text-[var(--text-main)] font-mono">{totalMatches}</div>
+          <div className="min-w-0">
+            <div className="text-[10px] sm:text-[11px] text-[var(--text-muted)] font-medium truncate">Video Có Sẵn</div>
+            <div className="text-lg sm:text-xl font-bold text-[var(--text-main)] font-mono">{totalVideos}</div>
           </div>
         </div>
 
-        <div className="apple-card p-4 flex items-center gap-4">
-          <div className="cc-icon green !w-10 !h-10 !rounded-xl text-white">
-            <Film className="w-5 h-5" />
+        <div className="apple-card p-3 sm:p-4 flex items-center gap-2.5 sm:gap-4">
+          <div className="cc-icon orange !w-9 !h-9 sm:!w-10 sm:!h-10 !rounded-xl text-white shrink-0">
+            <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <div>
-            <div className="text-[11px] text-[var(--text-muted)] font-medium">Tổng Clips Đã Cắt</div>
-            <div className="text-xl font-bold text-[var(--text-main)] font-mono">{totalClips}</div>
+          <div className="min-w-0">
+            <div className="text-[10px] sm:text-[11px] text-[var(--text-muted)] font-medium truncate">Trận Gemini AI</div>
+            <div className="text-lg sm:text-xl font-bold text-[var(--text-main)] font-mono">{totalMatches}</div>
+          </div>
+        </div>
+
+        <div className="apple-card p-3 sm:p-4 flex items-center gap-2.5 sm:gap-4">
+          <div className="cc-icon green !w-9 !h-9 sm:!w-10 sm:!h-10 !rounded-xl text-white shrink-0">
+            <Film className="w-4 h-4 sm:w-5 sm:h-5" />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[10px] sm:text-[11px] text-[var(--text-muted)] font-medium truncate">Clips Đã Cắt</div>
+            <div className="text-lg sm:text-xl font-bold text-[var(--text-main)] font-mono">{totalClips}</div>
           </div>
         </div>
       </div>
 
       {/* Filter & Search Toolbar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-1">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 p-1">
         <div className="relative w-full sm:w-80">
           <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-faint)]" />
           <input
@@ -404,22 +404,22 @@ export const TournamentsView: React.FC<TournamentsViewProps> = ({
           />
         </div>
 
-        <div className="tab-bar">
+        <div className="tab-bar overflow-x-auto no-scrollbar w-full sm:w-auto justify-start sm:justify-end flex-nowrap">
           <button
             onClick={() => setSportFilter('all')}
-            className={`tab-item ${sportFilter === 'all' ? 'active' : ''}`}
+            className={`tab-item shrink-0 ${sportFilter === 'all' ? 'active' : ''}`}
           >
             Tất Cả
           </button>
           <button
             onClick={() => setSportFilter('badminton')}
-            className={`tab-item ${sportFilter === 'badminton' ? 'active' : ''}`}
+            className={`tab-item shrink-0 ${sportFilter === 'badminton' ? 'active' : ''}`}
           >
             🏸 Cầu Lông
           </button>
           <button
             onClick={() => setSportFilter('pickleball')}
-            className={`tab-item ${sportFilter === 'pickleball' ? 'active' : ''}`}
+            className={`tab-item shrink-0 ${sportFilter === 'pickleball' ? 'active' : ''}`}
           >
             🏓 Pickleball
           </button>
@@ -427,11 +427,11 @@ export const TournamentsView: React.FC<TournamentsViewProps> = ({
       </div>
 
       {/* Tournaments Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
         {filtered.map((t) => (
           <div
             key={t.id}
-            className="apple-card p-5 flex flex-col justify-between space-y-4 group"
+            className="apple-card p-3.5 sm:p-5 flex flex-col justify-between space-y-3 sm:space-y-4 group"
           >
             {/* Top row */}
             <div className="space-y-2.5">
@@ -551,32 +551,32 @@ export const TournamentsView: React.FC<TournamentsViewProps> = ({
             </div>
 
             {/* Actions: CHẠY FULL - TIMELINE - Y-UPLOAD */}
-            <div className="grid grid-cols-3 gap-2 pt-1">
+            <div className="grid grid-cols-3 gap-1.5 sm:gap-2 pt-1">
               <button
                 onClick={() => onSelectTournamentForPipeline(t)}
-                className="flex items-center justify-center gap-1.5 py-2 px-1.5 rounded-full bg-[#0a84ff] hover:bg-[#0071e3] text-white text-xs font-bold transition-all shadow-md shadow-[#0a84ff]/20 cursor-pointer"
+                className="flex items-center justify-center gap-1 py-2 px-1 rounded-full bg-[#0a84ff] hover:bg-[#0071e3] text-white text-[11px] sm:text-xs font-bold transition-all shadow-md shadow-[#0a84ff]/20 cursor-pointer"
                 title="Khởi chạy toàn bộ pipeline (cắt clip và xuất bản)"
               >
-                <Play className="w-3.5 h-3.5 fill-current" />
-                <span>CHẠY FULL</span>
+                <Play className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current shrink-0" />
+                <span className="truncate">CHẠY FULL</span>
               </button>
 
               <button
                 onClick={() => onSelectTournamentForTimeline(t)}
-                className="flex items-center justify-center gap-1.5 py-2 px-1.5 rounded-full bg-[#242c36] hover:bg-[#2e3743] text-[var(--text-main)] text-xs font-semibold border border-white/5 transition-colors shadow-sm cursor-pointer"
+                className="flex items-center justify-center gap-1 py-2 px-1 rounded-full bg-[#242c36] hover:bg-[#2e3743] text-[var(--text-main)] text-[11px] sm:text-xs font-semibold border border-white/5 transition-colors shadow-sm cursor-pointer"
                 title="Xem hoặc chỉnh sửa timeline trận đấu"
               >
-                <Clock className="w-3.5 h-3.5 text-[var(--text-muted)]" />
-                <span>TIMELINE</span>
+                <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[var(--text-muted)] shrink-0" />
+                <span className="truncate">TIMELINE</span>
               </button>
 
               <button
                 onClick={() => onSelectTournamentForPipeline(t, 'source_yup')}
-                className="flex items-center justify-center gap-1.5 py-2 px-1.5 rounded-full bg-[#ff9f0a]/15 hover:bg-[#ff9f0a]/25 text-[#ff9f0a] text-xs font-bold border border-[#ff9f0a]/30 transition-all shadow-sm cursor-pointer"
+                className="flex items-center justify-center gap-1 py-2 px-1 rounded-full bg-[#ff9f0a]/15 hover:bg-[#ff9f0a]/25 text-[#ff9f0a] text-[11px] sm:text-xs font-bold border border-[#ff9f0a]/30 transition-all shadow-sm cursor-pointer"
                 title="Upload Video Nguồn Full lên YouTube kèm Chapters (Y-UPLOAD)"
               >
-                <UploadCloud className="w-3.5 h-3.5" />
-                <span>Y-UPLOAD</span>
+                <UploadCloud className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                <span className="truncate">Y-UPLOAD</span>
               </button>
             </div>
           </div>
@@ -592,8 +592,8 @@ export const TournamentsView: React.FC<TournamentsViewProps> = ({
 
       {/* Modal: Nhập Link Video & Agent Tự Động Lọc Dữ Liệu */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
-          <div className="apple-card w-full max-w-xl p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+          <div className="apple-card w-full max-w-xl p-4 sm:p-6 space-y-4 shadow-2xl animate-in fade-in slide-in-from-bottom-6 sm:zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl">
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <div className="flex items-center gap-2.5">
@@ -968,8 +968,8 @@ export const TournamentsView: React.FC<TournamentsViewProps> = ({
 
       {/* Modal: Chỉnh Sửa Thông Tin Giải Đấu */}
       {editingTournament && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
-          <div className="apple-card w-full max-w-xl p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+          <div className="apple-card w-full max-w-xl p-4 sm:p-6 space-y-4 shadow-2xl animate-in fade-in slide-in-from-bottom-6 sm:zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl">
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <div className="flex items-center gap-2.5">

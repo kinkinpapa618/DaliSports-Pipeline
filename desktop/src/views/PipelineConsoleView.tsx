@@ -182,16 +182,16 @@ export const PipelineConsoleView: React.FC<PipelineConsoleViewProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col p-6 space-y-5 overflow-hidden">
+    <div className="h-full flex flex-col p-3 sm:p-6 space-y-3.5 sm:space-y-5 overflow-y-auto lg:overflow-hidden">
       {/* Top Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-            <Cpu className="w-5 h-5" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 apple-card p-3 sm:p-4 shrink-0">
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="cc-icon green !w-9 !h-9 sm:!w-10 sm:!h-10 !rounded-xl text-white shrink-0">
+            <Cpu className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-[var(--text-main)]">
-              Pipeline Điều Khiển Trực Tiếp & Console Logs
+            <h1 className="text-base sm:text-lg font-bold text-[var(--text-main)]">
+              Pipeline Trực Tiếp & Console Logs
             </h1>
             <p className="text-xs text-[var(--text-muted)]">
               Điều khiển tự động hóa toàn bộ luồng: Tải Video → Gemini AI Timeline → FFmpeg Cut → Upload FB/YT
@@ -200,7 +200,7 @@ export const PipelineConsoleView: React.FC<PipelineConsoleViewProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {isPipelineRunning ? (
             <button
               onClick={handleKillPipeline}
@@ -214,7 +214,7 @@ export const PipelineConsoleView: React.FC<PipelineConsoleViewProps> = ({
               <button
                 onClick={() => handleStartPipeline(true)}
                 disabled={!selectedTournament}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-[#242c36] hover:bg-[#2e3743] text-[var(--text-main)] text-xs font-semibold border border-white/5 transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-[#242c36] hover:bg-[#2e3743] text-[var(--text-main)] text-xs font-semibold border border-white/5 transition-all cursor-pointer"
                 title="Chỉ phân tích tỷ số scoreboard bằng AI, không cắt file video"
               >
                 <Terminal className="w-3.5 h-3.5 text-[var(--accent-blue)]" />
@@ -224,7 +224,7 @@ export const PipelineConsoleView: React.FC<PipelineConsoleViewProps> = ({
               <button
                 onClick={handleStartSourceYUp}
                 disabled={!selectedTournament}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-[#ff9f0a] hover:bg-[#e08b08] text-white text-xs font-bold shadow-[0_5px_15px_rgba(255,159,10,0.3)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-[#ff9f0a] hover:bg-[#e08b08] text-white text-xs font-bold shadow-[0_5px_15px_rgba(255,159,10,0.3)] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Chỉ Upload Video Nguồn (Full Match) lên YouTube kèm Chapters, bỏ qua cắt clip (--yt-mode source --skip-cut)"
               >
                 <UploadCloud className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -237,7 +237,7 @@ export const PipelineConsoleView: React.FC<PipelineConsoleViewProps> = ({
                 className="btn-blue cursor-pointer"
               >
                 <Play className="w-4 h-4 fill-current" />
-                <span>Khởi Chạy Full Pipeline</span>
+                <span>Khởi Chạy Pipeline</span>
               </button>
             </>
           )}
@@ -245,9 +245,9 @@ export const PipelineConsoleView: React.FC<PipelineConsoleViewProps> = ({
       </div>
 
       {/* Main Grid: Settings Pane (Left) + Console Output (Right) */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5 min-h-0">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 min-h-0">
         {/* Settings Form (4 cols) */}
-        <div className="lg:col-span-4 apple-card p-4 flex flex-col space-y-4 overflow-y-auto">
+        <div className="lg:col-span-4 apple-card p-3.5 sm:p-4 flex flex-col space-y-4 overflow-y-auto">
           <div className="text-xs font-bold text-[var(--text-main)] uppercase tracking-wider flex items-center gap-2 pb-2 border-b border-[var(--border-subtle)]">
             <Sliders className="w-4 h-4 text-[var(--accent-blue)]" />
             <span>Cấu Hình Tác Vụ</span>
@@ -396,7 +396,7 @@ export const PipelineConsoleView: React.FC<PipelineConsoleViewProps> = ({
         </div>
 
         {/* Live Terminal Console (8 cols) */}
-        <div className="lg:col-span-8 apple-card !overflow-hidden flex flex-col shadow-2xl">
+        <div className="lg:col-span-8 apple-card !overflow-hidden flex flex-col shadow-2xl min-h-[380px] lg:min-h-0">
           {/* Console Header Bar */}
           <div className="h-10 bg-[var(--bg-dark)] border-b border-[var(--border-subtle)] flex items-center justify-between px-3 shrink-0">
             <div className="flex items-center gap-2">

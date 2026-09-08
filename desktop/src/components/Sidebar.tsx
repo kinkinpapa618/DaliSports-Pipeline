@@ -53,7 +53,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   return (
-    <aside className="w-64 bg-[var(--bg-sidebar)] border-r border-[var(--border-subtle)] flex flex-col justify-between select-none transition-colors">
+    <aside className="hidden md:flex w-64 bg-[var(--bg-sidebar)] border-r border-[var(--border-subtle)] flex-col justify-between select-none transition-colors shrink-0">
       {/* Top Menu */}
       <div className="p-3 space-y-1.5">
         <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-[var(--text-faint)] flex items-center justify-between">

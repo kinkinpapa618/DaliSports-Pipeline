@@ -5,6 +5,7 @@ import { MatchTimelineItem, PipelineLogMessage, PipelineOptions, SeoPreviewResul
 declare global {
   interface Window {
     api: {
+      isWeb?: boolean;
       scanTournaments: () => Promise<TournamentInfo[]>;
       createTournament: (date: string, slug: string) => Promise<{ success: boolean; folderName: string; path: string; error?: string }>;
       updateTournament: (tournamentPath: string, updates: any) => Promise<{ success: boolean; error?: string }>;

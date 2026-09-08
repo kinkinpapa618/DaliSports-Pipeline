@@ -17,6 +17,7 @@ import {
 } from './types';
 
 class WebApiAdapter {
+  public isWeb: boolean = true;
   private logListeners: ((log: PipelineLogMessage) => void)[] = [];
   private exitListeners: ((code: number | null) => void)[] = [];
   private ws: WebSocket | null = null;

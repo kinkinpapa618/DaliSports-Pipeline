@@ -192,15 +192,15 @@ export const TimelineEditorView: React.FC<TimelineEditorViewProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col p-6 space-y-5 overflow-y-auto">
+    <div className="h-full flex flex-col p-3 sm:p-6 space-y-3.5 sm:space-y-5 overflow-y-auto">
       {/* Top Header & Tournament Selector */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 apple-card p-4">
-        <div className="flex items-center gap-3">
-          <div className="cc-icon blue !w-10 !h-10 !rounded-xl text-white">
-            <Clock className="w-5 h-5" />
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4 apple-card p-3 sm:p-4">
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="cc-icon blue !w-9 !h-9 sm:!w-10 sm:!h-10 !rounded-xl text-white shrink-0">
+            <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-[var(--text-main)]">Hiệu Đính Scoreboard & Mốc Timeline</h1>
+            <h1 className="text-base sm:text-lg font-bold text-[var(--text-main)]">Hiệu Đính Scoreboard & Mốc Timeline</h1>
             <p className="text-xs text-[var(--text-muted)]">
               Kiểm tra tỷ số, căn chỉnh mốc thời gian và chọn các trận đấu cụ thể để xuất video clip highlight
             </p>
@@ -208,14 +208,14 @@ export const TimelineEditorView: React.FC<TimelineEditorViewProps> = ({
         </div>
 
         {/* Tournament Dropdown & Actions */}
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2">
           <select
             value={selectedTournament?.path || ''}
             onChange={(e) => {
               const found = tournaments.find((t) => t.path === e.target.value);
               if (found) onSelectTournament(found);
             }}
-            className="px-3.5 py-2 rounded-full bg-[var(--bg-input)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] font-medium focus:outline-none focus:border-[var(--accent-blue)] shadow-sm"
+            className="w-full sm:w-auto px-3.5 py-2 rounded-full bg-[var(--bg-input)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] font-medium focus:outline-none focus:border-[var(--accent-blue)] shadow-sm"
           >
             {tournaments.map((t) => (
               <option key={t.id} value={t.path}>
@@ -391,10 +391,10 @@ export const TimelineEditorView: React.FC<TimelineEditorViewProps> = ({
                 >
                   {/* Match Card Header */}
                   <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-[var(--border-subtle)]">
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
                       {/* Checkbox chọn cắt trận */}
                       <label 
-                        className="flex items-center gap-2 cursor-pointer select-none px-2.5 py-1 rounded-full bg-[var(--bg-input)] border border-[var(--border-subtle)] hover:border-white/20 transition-colors"
+                        className="flex items-center gap-1.5 sm:gap-2 cursor-pointer select-none px-2.5 py-1 rounded-full bg-[var(--bg-input)] border border-[var(--border-subtle)] hover:border-white/20 transition-colors"
                         title="Tick chọn để xuất video trận này"
                       >
                         <input
@@ -403,8 +403,8 @@ export const TimelineEditorView: React.FC<TimelineEditorViewProps> = ({
                           onChange={() => handleToggleSelect(idx)}
                           className="w-4 h-4 rounded bg-[var(--bg-element)] border-[var(--border-subtle)] text-[#0a84ff] focus:ring-0 cursor-pointer accent-[#0a84ff]"
                         />
-                        <span className={`text-[11px] font-bold ${isSelected ? 'text-[var(--accent-blue)]' : 'text-[var(--text-muted)]'}`}>
-                          {isSelected ? 'CẮT TRẬN NÀY' : 'BỎ QUA'}
+                        <span className={`text-[10px] sm:text-[11px] font-bold ${isSelected ? 'text-[var(--accent-blue)]' : 'text-[var(--text-muted)]'}`}>
+                          {isSelected ? 'CẮT TRẬN' : 'BỎ QUA'}
                         </span>
                       </label>
 
@@ -415,28 +415,28 @@ export const TimelineEditorView: React.FC<TimelineEditorViewProps> = ({
                         type="text"
                         value={match.round || 'Vòng Bảng'}
                         onChange={(e) => handleMatchChange(idx, 'round', e.target.value)}
-                        placeholder="Vòng thi đấu"
-                        className="px-2.5 py-1 rounded-lg bg-[var(--bg-input)] border border-[var(--border-subtle)] text-xs font-semibold text-[var(--text-main)] w-28 focus:outline-none focus:border-[var(--accent-blue)]"
+                        placeholder="Vòng"
+                        className="px-2 py-1 rounded-lg bg-[var(--bg-input)] border border-[var(--border-subtle)] text-xs font-semibold text-[var(--text-main)] w-20 sm:w-28 focus:outline-none focus:border-[var(--accent-blue)]"
                       />
                       <input
                         type="text"
                         value={match.category || 'Đôi Nam'}
                         onChange={(e) => handleMatchChange(idx, 'category', e.target.value)}
                         placeholder="Nội dung"
-                        className="px-2.5 py-1 rounded-lg bg-[var(--bg-input)] border border-[var(--border-subtle)] text-xs font-semibold text-[var(--text-main)] w-24 focus:outline-none focus:border-[var(--accent-blue)]"
+                        className="px-2 py-1 rounded-lg bg-[var(--bg-input)] border border-[var(--border-subtle)] text-xs font-semibold text-[var(--text-main)] w-20 sm:w-24 focus:outline-none focus:border-[var(--accent-blue)]"
                       />
                       <input
                         type="text"
                         value={match.court || 'Sân 1'}
                         onChange={(e) => handleMatchChange(idx, 'court', e.target.value)}
                         placeholder="Sân"
-                        className="px-2.5 py-1 rounded-lg bg-[var(--bg-input)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] w-20 focus:outline-none focus:border-[var(--accent-blue)]"
+                        className="px-2 py-1 rounded-lg bg-[var(--bg-input)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] w-16 sm:w-20 focus:outline-none focus:border-[var(--accent-blue)]"
                       />
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-[#0a84ff]/15 border border-[#0a84ff]/20 text-[#0a84ff] font-mono font-medium">
-                        Thời lượng: {formatDuration(match.start_time, match.end_time)}
+                      <span className="text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-[#0a84ff]/15 border border-[#0a84ff]/20 text-[#0a84ff] font-mono font-medium">
+                        {formatDuration(match.start_time, match.end_time)}
                       </span>
 
                       <button

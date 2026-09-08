@@ -9,6 +9,7 @@ import { SettingsView } from './views/SettingsView';
 import { ActiveTab, TournamentInfo, UpdateCheckResult } from './types';
 import { useSkin } from './hooks/useSkin';
 import { UpdateModal } from './components/UpdateModal';
+import { BottomNav } from './components/BottomNav';
 
 export const App: React.FC = () => {
   const { skin, setSkin, toggleSkin } = useSkin();
@@ -110,7 +111,7 @@ export const App: React.FC = () => {
         />
 
         {/* Central Work Area */}
-        <main className="flex-1 overflow-hidden bg-[#14181d] relative">
+        <main className="flex-1 overflow-hidden bg-[#14181d] relative pb-16 md:pb-0">
           {currentTab === 'tournaments' && (
             <TournamentsView
               tournaments={tournaments}
@@ -159,6 +160,14 @@ export const App: React.FC = () => {
           )}
         </main>
       </div>
+
+      {/* Mobile Bottom Navigation Bar */}
+      <BottomNav
+        currentTab={currentTab}
+        onTabChange={setCurrentTab}
+        tournamentCount={tournaments.length}
+        isPipelineRunning={isPipelineRunning}
+      />
 
       {/* Interactive Update Modal */}
       <UpdateModal
