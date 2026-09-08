@@ -3,7 +3,8 @@ import {
   Settings, Key, Video, Globe, HardDrive, 
   CheckCircle, AlertCircle, Shield, FolderOpen, Save,
   Eye, EyeOff, ExternalLink, RefreshCw, Sparkles, Sun, Moon,
-  ArrowUpCircle, Download, Zap, Loader2, RotateCw
+  ArrowUpCircle, Download, Zap, Loader2, RotateCw,
+  Wifi, Copy, Check, QrCode
 } from 'lucide-react';
 import { EnvConfig, UpdateCheckResult } from '../types';
 import { SkinMode } from '../hooks/useSkin';
@@ -70,6 +71,58 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     }
   };
 
+  // Remote Tunnel State
+  const [tunnelRunning, setTunnelRunning] = useState(false);
+  const [tunnelUrl, setTunnelUrl] = useState<string | null>(null);
+  const [tunnelLoading, setTunnelLoading] = useState(false);
+  const [tunnelError, setTunnelError] = useState<string | null>(null);
+  const [copiedUrl, setCopiedUrl] = useState(false);
+
+  const checkTunnelStatus = async () => {
+    if (window.api?.getTunnelStatus) {
+      try {
+        const s = await window.api.getTunnelStatus();
+        setTunnelRunning(Boolean(s.active));
+        setTunnelUrl(s.url || null);
+        if (s.error) setTunnelError(s.error);
+      } catch {}
+    }
+  };
+
+  const handleToggleTunnel = async () => {
+    setTunnelLoading(true);
+    setTunnelError(null);
+    try {
+      if (tunnelRunning) {
+        if (window.api?.stopTunnel) {
+          await window.api.stopTunnel();
+          setTunnelRunning(false);
+          setTunnelUrl(null);
+        }
+      } else {
+        if (window.api?.startTunnel) {
+          const res = await window.api.startTunnel();
+          if (res.success && res.url) {
+            setTunnelRunning(true);
+            setTunnelUrl(res.url);
+          } else {
+            setTunnelError(res.error || 'Không thể khởi động Cloudflare Tunnel');
+          }
+        }
+      }
+    } catch (err: any) {
+      setTunnelError(err?.message || 'Lỗi khi khởi chạy Tunnel');
+    } finally {
+      setTunnelLoading(false);
+    }
+  };
+
+  const handleCopyUrl = (url: string) => {
+    navigator.clipboard.writeText(url);
+    setCopiedUrl(true);
+    setTimeout(() => setCopiedUrl(false), 2500);
+  };
+
   // File status
   const [status, setStatus] = useState<Partial<EnvConfig>>({
     hasCookiesTxt: false,
@@ -80,6 +133,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const loadConfig = async () => {
     setLoading(true);
     try {
+      checkTunnelStatus();
       if (window.api && typeof window.api.getConfig === 'function') {
         const conf: EnvConfig = await window.api.getConfig();
         if (conf) {
@@ -471,6 +525,144 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             Mặc định hệ thống sẽ kiểm tra tệp <code>version.json</code> trên repository để xác định bản cập nhật mới.
           </p>
         </div>
+      </div>
+
+      {/* Remote Access & Cloudflare Tunnel Card */}
+      <div className="apple-card p-5 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[var(--border-subtle)]">
+          <div className="flex items-center gap-2.5">
+            <div className={`w-8 h-8 rounded-xl flex items-center justify-center border border-[var(--border-subtle)] ${
+              tunnelRunning ? 'bg-[#30d158]/15 text-[#30d158] border-[#30d158]/30' : 'bg-[var(--bg-input)] text-[var(--text-muted)]'
+            }`}>
+              <Wifi className={`w-4 h-4 ${tunnelRunning ? 'animate-pulse' : ''}`} />
+            </div>
+            <div>
+              <h3 className="text-xs font-bold text-[var(--text-main)]">Truy Cập Từ Xa (Remote Access & Cloudflare Tunnel)</h3>
+              <p className="text-[11px] text-[var(--text-muted)]">
+                Tạo tên miền tunnel bảo mật để mở và điều khiển DaliSports Studio từ điện thoại, iPad hoặc máy tính khác
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className={`px-2.5 py-1 rounded-full text-[10px] font-mono font-bold flex items-center gap-1.5 border ${
+              tunnelRunning 
+                ? 'bg-[#30d158]/15 border-[#30d158]/30 text-[#30d158]' 
+                : 'bg-[var(--bg-input)] border-[var(--border-subtle)] text-[var(--text-muted)]'
+            }`}>
+              <span className={`w-2 h-2 rounded-full ${tunnelRunning ? 'bg-[#30d158] animate-ping' : 'bg-slate-500'}`} />
+              <span>{tunnelRunning ? 'ĐANG PHÁT SÓNG TỪ XA' : 'CHƯA KÍCH HOẠT'}</span>
+            </span>
+
+            <button
+              type="button"
+              disabled={tunnelLoading}
+              onClick={handleToggleTunnel}
+              className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all shadow-md flex items-center gap-1.5 cursor-pointer ${
+                tunnelRunning
+                  ? 'bg-rose-600 hover:bg-rose-500 text-white'
+                  : 'btn-blue !shadow-[0_4px_12px_rgba(10,132,255,0.3)]'
+              }`}
+            >
+              {tunnelLoading ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>Đang xử lý...</span>
+                </>
+              ) : tunnelRunning ? (
+                <span>Tắt Tunnel</span>
+              ) : (
+                <>
+                  <Globe className="w-3.5 h-3.5" />
+                  <span>Bật Truy Cập Từ Xa</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {tunnelError && (
+          <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>Lỗi: {tunnelError}</span>
+          </div>
+        )}
+
+        {tunnelRunning && tunnelUrl ? (
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-[#0a84ff]/10 via-emerald-500/5 to-transparent border border-[#0a84ff]/30 space-y-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="space-y-1">
+                <div className="text-[11px] font-semibold text-[var(--accent-blue)] flex items-center gap-1.5">
+                  <Globe className="w-3.5 h-3.5" />
+                  <span>Đường Dẫn Truy Cập Từ Xa Của Bạn:</span>
+                </div>
+                <div className="text-sm font-mono font-bold text-[var(--text-main)] select-all break-all">
+                  {tunnelUrl}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => handleCopyUrl(tunnelUrl)}
+                  className="px-3.5 py-1.5 rounded-xl bg-[var(--bg-input)] hover:bg-[var(--bg-highlight)] text-[var(--text-main)] text-xs font-medium border border-[var(--border-subtle)] flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  {copiedUrl ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-[#30d158]" />
+                      <span className="text-[#30d158]">Đã Sao Chép!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5 text-[var(--text-muted)]" />
+                      <span>Sao Chép Link</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => window.api?.openUrl(tunnelUrl)}
+                  className="px-3.5 py-1.5 rounded-xl bg-[var(--accent-blue)] hover:brightness-110 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-[#0a84ff]/25 transition-all cursor-pointer"
+                >
+                  <span>Mở Trình Duyệt</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row items-center gap-4">
+              <div className="bg-white p-2 rounded-xl shadow-md shrink-0">
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(tunnelUrl)}`}
+                  alt="Mã QR Truy Cập Từ Xa"
+                  className="w-28 h-28 object-contain"
+                />
+              </div>
+              <div className="space-y-1 text-xs text-[var(--text-muted)]">
+                <div className="font-semibold text-[var(--text-main)] flex items-center gap-1.5">
+                  <QrCode className="w-4 h-4 text-[#ff9f0a]" />
+                  <span>Quét mã QR bằng Camera điện thoại:</span>
+                </div>
+                <p>1. Mở ứng dụng Camera trên iPhone hoặc Android và hướng vào mã QR bên cạnh.</p>
+                <p>2. Nhấn vào liên kết thông báo xuất hiện trên màn hình để mở ngay bảng điều khiển DaliSports Studio.</p>
+                <p>3. Bạn có thể thêm trang web vào màn hình chính (Add to Home Screen) để sử dụng như một App độc lập.</p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="p-3.5 bg-[var(--bg-input)] rounded-xl border border-[var(--border-subtle)] flex items-center justify-between text-xs">
+            <div className="space-y-0.5">
+              <span className="text-[var(--text-muted)]">Cơ chế bảo mật Cloudflare Tunnel:</span>
+              <p className="text-[11px] text-[var(--text-faint)]">
+                Không cần mở cổng Modem (No Port Forwarding), hỗ trợ HTTPS SSL tự động, bảo vệ an toàn địa chỉ IP gốc của máy tính.
+              </p>
+            </div>
+            <div className="text-[11px] font-mono text-[var(--text-muted)] shrink-0 pl-3">
+              Port: 8000 (API & Web)
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Main Settings Form */}

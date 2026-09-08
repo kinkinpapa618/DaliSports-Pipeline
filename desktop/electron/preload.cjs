@@ -38,6 +38,11 @@ contextBridge.exposeInMainWorld('api', {
   applyUpdate: () => ipcRenderer.invoke('update:apply'),
   restartApp: () => ipcRenderer.invoke('app:restart'),
 
+  // Remote Tunnel Access
+  getTunnelStatus: () => ipcRenderer.invoke('tunnel:status'),
+  startTunnel: () => ipcRenderer.invoke('tunnel:start'),
+  stopTunnel: () => ipcRenderer.invoke('tunnel:stop'),
+
   // Window Controls
   windowMinimize: () => ipcRenderer.send('window:minimize'),
   windowMaximize: () => ipcRenderer.send('window:maximize'),

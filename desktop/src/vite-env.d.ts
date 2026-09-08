@@ -32,6 +32,10 @@ declare global {
       applyUpdate: () => Promise<ApplyUpdateResult>;
       restartApp: () => Promise<void>;
 
+      getTunnelStatus: () => Promise<{ active: boolean; url?: string; error?: string }>;
+      startTunnel: () => Promise<{ success: boolean; url?: string; error?: string }>;
+      stopTunnel: () => Promise<{ success: boolean }>;
+
       windowMinimize: () => void;
       windowMaximize: () => void;
       windowClose: () => void;

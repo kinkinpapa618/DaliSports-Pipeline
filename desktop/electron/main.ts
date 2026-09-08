@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 
 // Prevent GPU shader disk cache lock issues on Windows
 app.commandLine.appendSwitch('disable-gpu-shader-disk-cache');
@@ -203,6 +204,103 @@ function registerIpcHandlers() {
     app.exit(0);
   });
 
+  // Remote Tunnel Access
+  let remoteServerProc: ChildProcessWithoutNullStreams | null = null;
+  let remoteTunnelUrl: string | null = null;
+  let remoteTunnelError: string | null = null;
+
+  const stopRemoteServer = () => {
+    if (remoteServerProc) {
+      try {
+        remoteServerProc.kill();
+      } catch {}
+      remoteServerProc = null;
+    }
+    remoteTunnelUrl = null;
+    remoteTunnelError = null;
+  };
+
+  ipcMain.handle('tunnel:status', async () => {
+    return {
+      active: Boolean(remoteServerProc && remoteTunnelUrl),
+      url: remoteTunnelUrl,
+      error: remoteTunnelError,
+    };
+  });
+
+  ipcMain.handle('tunnel:start', async () => {
+    if (remoteServerProc && remoteTunnelUrl) {
+      return { success: true, url: remoteTunnelUrl };
+    }
+
+    stopRemoteServer();
+
+    const serverScript = path.join(WORKSPACE_ROOT, 'system', 'remote_server.py');
+    return new Promise((resolve) => {
+      try {
+        remoteServerProc = spawn('python', ['-u', serverScript, '--tunnel', '--port', '8000'], {
+          cwd: WORKSPACE_ROOT,
+          env: {
+            ...process.env,
+            PYTHONIOENCODING: 'utf-8',
+            PYTHONUNBUFFERED: '1',
+          },
+        });
+
+        let resolved = false;
+
+        const handleOutput = (data: Buffer) => {
+          const text = data.toString('utf-8');
+          const match = text.match(/https:\/\/[a-zA-Z0-9-]+\.trycloudflare\.com/);
+          if (match && !resolved) {
+            resolved = true;
+            remoteTunnelUrl = match[0];
+            remoteTunnelError = null;
+            resolve({ success: true, url: remoteTunnelUrl });
+          }
+        };
+
+        remoteServerProc.stdout.on('data', handleOutput);
+        remoteServerProc.stderr.on('data', handleOutput);
+
+        remoteServerProc.on('close', (code) => {
+          remoteServerProc = null;
+          remoteTunnelUrl = null;
+          if (!resolved) {
+            resolved = true;
+            resolve({ success: false, error: `Máy chủ từ xa kết thúc (code ${code})` });
+          }
+        });
+
+        remoteServerProc.on('error', (err) => {
+          remoteTunnelError = err.message;
+          if (!resolved) {
+            resolved = true;
+            resolve({ success: false, error: err.message });
+          }
+        });
+
+        setTimeout(() => {
+          if (!resolved) {
+            resolved = true;
+            resolve({
+              success: Boolean(remoteTunnelUrl),
+              url: remoteTunnelUrl,
+              error: remoteTunnelUrl ? undefined : 'Quá thời gian kết nối Cloudflare Tunnel (15s)',
+            });
+          }
+        }, 15000);
+      } catch (err: any) {
+        resolve({ success: false, error: err.message });
+      }
+    });
+  });
+
+  ipcMain.handle('tunnel:stop', async () => {
+    stopRemoteServer();
+    return { success: true };
+  });
+
   // Window Controls
   ipcMain.on('window:minimize', () => {
     mainWindow?.minimize();
@@ -217,6 +315,7 @@ function registerIpcHandlers() {
   });
 
   ipcMain.on('window:close', () => {
+    stopRemoteServer();
     mainWindow?.close();
   });
 }
