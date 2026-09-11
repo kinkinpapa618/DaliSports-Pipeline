@@ -272,10 +272,24 @@ function registerIpcHandlers() {
   let remoteTunnelUrl: string | null = null;
   let remoteTunnelError: string | null = null;
 
-  const stopRemoteServer = () => {
+  const stopRemoteServer = async () => {
+    // 1. If remote_server.py is running on port 8000, request tunnel stop
+    try {
+      await fetch('http://127.0.0.1:8000/api/tunnel/stop', { 
+        method: 'POST', 
+        signal: AbortSignal.timeout(2000) 
+      });
+    } catch {}
+
+    // 2. Kill spawned server process and its children if any
     if (remoteServerProc) {
+      const pid = remoteServerProc.pid;
       try {
-        remoteServerProc.kill();
+        if (process.platform === 'win32' && pid) {
+          spawn('taskkill', ['/F', '/T', '/PID', pid.toString()]);
+        } else {
+          remoteServerProc.kill();
+        }
       } catch {}
       remoteServerProc = null;
     }
@@ -284,6 +298,23 @@ function registerIpcHandlers() {
   };
 
   ipcMain.handle('tunnel:status', async () => {
+    // Check if remote_server API is active on port 8000
+    try {
+      const res = await fetch('http://127.0.0.1:8000/api/tunnel/status', { 
+        signal: AbortSignal.timeout(2000) 
+      });
+      if (res.ok) {
+        const data = (await res.json()) as { active: boolean; url?: string; error?: string };
+        remoteTunnelUrl = data.active && data.url ? data.url : null;
+        remoteTunnelError = data.error || null;
+        return {
+          active: Boolean(data.active && remoteTunnelUrl),
+          url: remoteTunnelUrl,
+          error: remoteTunnelError,
+        };
+      }
+    } catch {}
+
     return {
       active: Boolean(remoteServerProc && remoteTunnelUrl),
       url: remoteTunnelUrl,
@@ -292,12 +323,26 @@ function registerIpcHandlers() {
   });
 
   ipcMain.handle('tunnel:start', async () => {
-    if (remoteServerProc && remoteTunnelUrl) {
-      return { success: true, url: remoteTunnelUrl };
-    }
+    // Always stop previous tunnel first to ensure a new dynamic URL is generated
+    await stopRemoteServer();
 
-    stopRemoteServer();
+    // 1. Try starting tunnel via existing local remote server on port 8000
+    try {
+      const res = await fetch('http://127.0.0.1:8000/api/tunnel/start', {
+        method: 'POST',
+        signal: AbortSignal.timeout(18000),
+      });
+      if (res.ok) {
+        const data = (await res.json()) as { success: boolean; url?: string; error?: string };
+        if (data.success && data.url) {
+          remoteTunnelUrl = data.url;
+          remoteTunnelError = null;
+          return { success: true, url: data.url };
+        }
+      }
+    } catch {}
 
+    // 2. Otherwise spawn remote_server.py with --tunnel
     const serverScript = path.join(WORKSPACE_ROOT, 'system', 'remote_server.py');
     return new Promise((resolve) => {
       try {
@@ -349,10 +394,10 @@ function registerIpcHandlers() {
             resolve({
               success: Boolean(remoteTunnelUrl),
               url: remoteTunnelUrl,
-              error: remoteTunnelUrl ? undefined : 'Quá thời gian kết nối Cloudflare Tunnel (15s)',
+              error: remoteTunnelUrl ? undefined : 'Quá thời gian kết nối Cloudflare Tunnel (18s)',
             });
           }
-        }, 15000);
+        }, 18000);
       } catch (err: any) {
         resolve({ success: false, error: err.message });
       }
@@ -360,7 +405,7 @@ function registerIpcHandlers() {
   });
 
   ipcMain.handle('tunnel:stop', async () => {
-    stopRemoteServer();
+    await stopRemoteServer();
     return { success: true };
   });
 

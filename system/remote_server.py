@@ -101,55 +101,48 @@ def _run_tunnel_process(port: int):
         state.tunnel_error = "Không tìm thấy cloudflared.exe trên hệ thống."
         return
 
-    # Check if custom Cloudflare Tunnel token is provided in .env
-    token = os.environ.get("CLOUDFLARE_TUNNEL_TOKEN", "").strip()
-    custom_domain = os.environ.get("CLOUDFLARE_CUSTOM_DOMAIN", "").strip()
-
-    if token:
-        cmd = [bin_path, "tunnel", "run", "--token", token]
-        if custom_domain:
-            state.tunnel_url = f"https://{custom_domain}" if not custom_domain.startswith("http") else custom_domain
-    else:
-        cmd = [bin_path, "tunnel", "--url", f"http://127.0.0.1:{port}"]
+    cmd = [bin_path, "tunnel", "--url", f"http://127.0.0.1:{port}"]
 
     try:
         proc = subprocess.Popen(
             cmd,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
             text=True,
             encoding="utf-8",
             errors="ignore",
+            bufsize=1,
         )
         state.tunnel_proc = proc
 
         while proc.poll() is None:
-            line = proc.stderr.readline()
+            line = proc.stdout.readline()
             if not line:
                 continue
             m = re.search(r"https://[a-zA-Z0-9-]+\.trycloudflare\.com", line)
-            if m:
+            if m and not state.tunnel_url:
                 state.tunnel_url = m.group(0)
                 state.tunnel_error = None
-                print(f"\n[CLOUDFLARE TUNNEL SAN SANG] Public URL: {state.tunnel_url}")
+                print(f"\n[CLOUDFLARE TUNNEL SAN SANG] Public URL moi: {state.tunnel_url}")
                 print_qr(state.tunnel_url)
-                break
     except Exception as e:
         state.tunnel_error = str(e)
         print(f"[Tunnel Error] {e}")
 
 def start_tunnel_service(port: int = 8000) -> bool:
-    if state.tunnel_proc and state.tunnel_proc.poll() is None:
-        return True
+    # Luon dung tien trinh cu truoc de moi lan bat se tao ra mot link tunnel moi
+    stop_tunnel_service()
+    time.sleep(0.5)
+
     state.tunnel_url = None
     state.tunnel_error = None
     t = threading.Thread(target=_run_tunnel_process, args=(port,), daemon=True)
     t.start()
     state.tunnel_thread = t
 
-    # Wait up to 8 seconds for URL detection
+    # Cho toi da 15 giay de lay link trycloudflare moi
     t0 = time.time()
-    while time.time() - t0 < 8:
+    while time.time() - t0 < 15:
         if state.tunnel_url or state.tunnel_error:
             break
         time.sleep(0.3)
@@ -159,8 +152,12 @@ def start_tunnel_service(port: int = 8000) -> bool:
 def stop_tunnel_service():
     if state.tunnel_proc:
         try:
-            state.tunnel_proc.terminate()
-            state.tunnel_proc.kill()
+            pid = state.tunnel_proc.pid
+            if sys.platform == "win32" and pid:
+                subprocess.run(f"taskkill /F /T /PID {pid}", shell=True, capture_output=True)
+            else:
+                state.tunnel_proc.terminate()
+                state.tunnel_proc.kill()
         except Exception:
             pass
         state.tunnel_proc = None
@@ -186,16 +183,14 @@ def print_qr(url: str):
 
 @app.get("/api/tunnel/status")
 async def get_tunnel_status():
-    active = state.tunnel_proc is not None and state.tunnel_proc.poll() is None and state.tunnel_url is not None
-    url = state.tunnel_url
-    if not url:
-        custom_domain = os.environ.get("CLOUDFLARE_CUSTOM_DOMAIN", "server.trongtaiso.com").strip()
-        if custom_domain:
-            url = f"https://{custom_domain}" if not custom_domain.startswith("http") else custom_domain
-            active = True
+    active = (
+        state.tunnel_proc is not None 
+        and state.tunnel_proc.poll() is None 
+        and state.tunnel_url is not None
+    )
     return {
         "active": active,
-        "url": url,
+        "url": state.tunnel_url if active else None,
         "error": state.tunnel_error,
     }
 

@@ -321,9 +321,9 @@ export const PipelineConsoleView: React.FC<PipelineConsoleViewProps> = ({
           </div>
 
           <div className={`${mobileConfigCollapsed ? 'hidden lg:flex' : 'flex'} flex-col gap-4 p-3 sm:p-4 overflow-y-auto`}>
-            {/* Tournament selection - ưu tiên mobile: to, dễ bấm */}
+            {/* Tournament selection */}
             <div>
-              <label className="block text-xs font-semibold text-[var(--text-main)] mb-1.5">
+              <label className="block text-xs font-semibold text-[var(--text-main)] mb-1">
                 Giải Đấu
               </label>
               <select
@@ -333,7 +333,7 @@ export const PipelineConsoleView: React.FC<PipelineConsoleViewProps> = ({
                   if (found) onSelectTournament(found);
                 }}
                 disabled={isPipelineRunning}
-                className="w-full px-3 py-3 sm:py-2 rounded-xl sm:rounded-lg bg-[var(--bg-input)] border border-[var(--border-subtle)] text-sm sm:text-xs text-[var(--text-main)] focus:outline-none focus:border-[#0a84ff] focus:ring-2 focus:ring-[#0a84ff]/20 min-h-[44px]"
+                className="w-full px-2.5 py-1.5 rounded-lg bg-[var(--bg-input)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:outline-none focus:border-[#0a84ff] focus:ring-2 focus:ring-[#0a84ff]/20"
               >
                 {tournaments.map((t) => (
                   <option key={t.id} value={t.path}>
@@ -342,16 +342,16 @@ export const PipelineConsoleView: React.FC<PipelineConsoleViewProps> = ({
                 ))}
               </select>
               {selectedTournament && (
-                <div className="mt-1.5 flex items-center gap-1.5 text-[11px] text-[var(--text-muted)]">
+                <div className="mt-1 flex items-center gap-1.5 text-[11px] text-[var(--text-muted)]">
                   <span className={`w-2 h-2 rounded-full ${selectedTournament.hasVideo ? 'bg-[#30d158]' : 'bg-[#ff9f0a]'}`} />
                   {selectedTournament.hasVideo ? `${selectedTournament.videoSizeMb}MB • ${selectedTournament.matchCount} trận` : 'Chưa có video'}
                 </div>
               )}
             </div>
 
-            {/* YouTube Download URL - mobile: input cao */}
+            {/* YouTube Download URL */}
             <div>
-              <label className="block text-xs font-semibold text-[var(--text-main)] mb-1.5">
+              <label className="block text-xs font-semibold text-[var(--text-main)] mb-1">
                 Link Video <span className="font-normal text-[var(--text-muted)]">(tùy chọn)</span>
               </label>
               <input
@@ -361,78 +361,78 @@ export const PipelineConsoleView: React.FC<PipelineConsoleViewProps> = ({
                 value={ytUrl}
                 onChange={(e) => setYtUrl(e.target.value)}
                 disabled={isPipelineRunning}
-                className="w-full px-3 py-3 sm:py-1.5 rounded-xl sm:rounded-lg bg-[var(--bg-input)] border border-[var(--border-subtle)] text-sm sm:text-xs text-[var(--text-main)] placeholder-[var(--text-faint)] focus:outline-none focus:border-[#0a84ff] focus:ring-2 focus:ring-[#0a84ff]/20 min-h-[44px]"
+                className="w-full px-2.5 py-1.5 rounded-lg bg-[var(--bg-input)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] placeholder-[var(--text-faint)] focus:outline-none focus:border-[#0a84ff] focus:ring-2 focus:ring-[#0a84ff]/20"
               />
             </div>
 
-            {/* Tên giải + Sân - mobile 1 cột cho dễ bấm */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Tên giải + Sân */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div>
-                <label className="block text-xs font-semibold text-[var(--text-muted)] mb-1.5">Tên Giải Đấu</label>
+                <label className="block text-xs font-semibold text-[var(--text-muted)] mb-1">Tên Giải Đấu</label>
                 <input
                   type="text"
                   value={tournamentName}
                   onChange={(e) => setTournamentName(e.target.value)}
                   disabled={isPipelineRunning}
-                  className="w-full px-3 py-3 sm:py-2 rounded-xl sm:rounded-lg bg-[var(--bg-input)] border border-[var(--border-subtle)] text-sm sm:text-xs text-[var(--text-main)] focus:outline-none focus:border-[#0a84ff] min-h-[44px]"
+                  className="w-full px-2.5 py-1.5 rounded-lg bg-[var(--bg-input)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:outline-none focus:border-[#0a84ff]"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-[var(--text-muted)] mb-1.5">Sân</label>
+                <label className="block text-xs font-semibold text-[var(--text-muted)] mb-1">Sân</label>
                 <input
                   type="text"
                   value={courtName}
                   onChange={(e) => setCourtName(e.target.value)}
                   disabled={isPipelineRunning}
-                  className="w-full px-3 py-3 sm:py-2 rounded-xl sm:rounded-lg bg-[var(--bg-input)] border border-[var(--border-subtle)] text-sm sm:text-xs text-[var(--text-main)] focus:outline-none focus:border-[#0a84ff] min-h-[44px]"
+                  className="w-full px-2.5 py-1.5 rounded-lg bg-[var(--bg-input)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:outline-none focus:border-[#0a84ff]"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2.5">
               <div>
-                <label className="block text-xs font-semibold text-[var(--text-muted)] mb-1.5">Nội dung</label>
+                <label className="block text-xs font-semibold text-[var(--text-muted)] mb-1">Nội dung</label>
                 <input
                   type="text"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                   disabled={isPipelineRunning}
-                  className="w-full px-3 py-3 sm:py-2 rounded-xl sm:rounded-lg bg-[var(--bg-input)] border border-[var(--border-subtle)] text-sm sm:text-xs text-[var(--text-main)] focus:outline-none focus:border-[#0a84ff] min-h-[44px]"
+                  className="w-full px-2.5 py-1.5 rounded-lg bg-[var(--bg-input)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:outline-none focus:border-[#0a84ff]"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-[var(--text-muted)] mb-1.5">Tài Trợ</label>
+                <label className="block text-xs font-semibold text-[var(--text-muted)] mb-1">Tài Trợ</label>
                 <input
                   type="text"
                   placeholder="Yonex..."
                   value={sponsor}
                   onChange={(e) => setSponsor(e.target.value)}
                   disabled={isPipelineRunning}
-                  className="w-full px-3 py-3 sm:py-2 rounded-xl sm:rounded-lg bg-[var(--bg-input)] border border-[var(--border-subtle)] text-sm sm:text-xs text-[var(--text-main)] placeholder-[var(--text-faint)] focus:outline-none focus:border-[#0a84ff] min-h-[44px]"
+                  className="w-full px-2.5 py-1.5 rounded-lg bg-[var(--bg-input)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] placeholder-[var(--text-faint)] focus:outline-none focus:border-[#0a84ff]"
                 />
               </div>
             </div>
 
-            {/* Nền tảng & Chế độ - mobile: pill buttons thay vì select nhỏ */}
-            <div className="space-y-3">
+            {/* Nền tảng & Chế độ */}
+            <div className="space-y-2.5">
               <div>
-                <label className="block text-xs font-semibold text-[var(--text-muted)] mb-1.5">Nền tảng</label>
+                <label className="block text-xs font-semibold text-[var(--text-muted)] mb-1">Nền tảng</label>
                 <div className="grid grid-cols-3 gap-1.5">
                   {(['youtube','facebook','both'] as const).map(p => (
                     <button key={p} type="button" onClick={() => setPlatform(p)} disabled={isPipelineRunning}
-                      className={`py-2.5 sm:py-2 rounded-xl sm:rounded-lg text-xs font-bold border transition-colors min-h-[44px] ${platform===p ? 'bg-[#0a84ff] text-white border-[#0a84ff] shadow-sm' : 'bg-[var(--bg-input)] text-[var(--text-muted)] border-[var(--border-subtle)]'}` }>
+                      className={`py-1.5 rounded-lg text-xs font-bold border transition-colors ${platform===p ? 'bg-[#0a84ff] text-white border-[#0a84ff] shadow-sm' : 'bg-[var(--bg-input)] text-[var(--text-muted)] border-[var(--border-subtle)]'}` }>
                       {p==='youtube' ? 'YouTube' : p==='facebook' ? 'Facebook' : 'Cả hai'}
                     </button>
                   ))}
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-[var(--text-muted)] mb-1.5">Chế độ YT</label>
+                <label className="block text-xs font-semibold text-[var(--text-muted)] mb-1">Chế độ YT</label>
                 <select
                   value={ytMode}
                   onChange={(e) => setYtMode(e.target.value as any)}
                   disabled={isPipelineRunning || platform === 'facebook'}
-                  className="w-full px-3 py-3 sm:py-2 rounded-xl sm:rounded-lg bg-[var(--bg-input)] border border-[var(--border-subtle)] text-sm sm:text-xs text-[var(--text-main)] focus:outline-none focus:border-[#0a84ff] font-mono min-h-[44px] disabled:opacity-50"
+                  className="w-full px-2.5 py-1.5 rounded-lg bg-[var(--bg-input)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] focus:outline-none focus:border-[#0a84ff] font-mono disabled:opacity-50"
                 >
                   <option value="both">Video gốc + Clips</option>
                   <option value="clips">Chỉ Clips</option>
@@ -441,8 +441,8 @@ export const PipelineConsoleView: React.FC<PipelineConsoleViewProps> = ({
               </div>
             </div>
 
-            {/* 4 bước - mobile: list 1 cột lớn, desktop 2 cột */}
-            <div className="space-y-2.5 pt-3 border-t border-[var(--border-subtle)]">
+            {/* 4 bước */}
+            <div className="space-y-2 pt-2.5 border-t border-[var(--border-subtle)]">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-[var(--text-main)] flex items-center gap-1.5">
                   <Settings2 className="w-3.5 h-3.5 text-[#0a84ff]" />
@@ -450,34 +450,34 @@ export const PipelineConsoleView: React.FC<PipelineConsoleViewProps> = ({
                 </span>
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#0a84ff]/10 text-[#0a84ff] font-mono">Bỏ tick = bỏ qua</span>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-1.5">
                 {[
                   {k:'dl', label:'1. Download/Import', val:!skipDownload, set:(v:boolean)=>setSkipDownload(!v), color:'#0a84ff'},
                   {k:'tl', label:'2. Timeline AI', val:!skipTimeline, set:(v:boolean)=>setSkipTimeline(!v), color:'#30d158'},
                   {k:'cut', label:'3. Cắt Clip', val:!skipCut, set:(v:boolean)=>setSkipCut(!v), color:'#ff9f0a'},
                   {k:'up', label:'4. Upload', val:!skipUpload, set:(v:boolean)=>setSkipUpload(!v), color:'#ff453a'},
                 ].map(s => (
-                  <label key={s.k} className={`flex items-center gap-3 px-3 py-3 sm:py-2.5 rounded-xl border cursor-pointer transition-colors min-h-[48px] ${s.val ? 'bg-[var(--bg-input)] border-[var(--border-subtle)]' : 'bg-[var(--bg-element)] border-transparent opacity-60'}`} style={{ borderColor: s.val ? s.color+'40' : undefined, background: s.val ? s.color+'10' : undefined }}>
-                    <input type="checkbox" checked={s.val} onChange={(e) => s.set(e.target.checked)} disabled={isPipelineRunning} className="w-5 h-5 sm:w-4 sm:h-4 rounded accent-[#0a84ff] shrink-0" />
-                    <span className="text-sm sm:text-xs font-semibold text-[var(--text-main)]">{s.label}</span>
+                  <label key={s.k} className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg border cursor-pointer transition-colors select-none ${s.val ? 'bg-[var(--bg-input)] border-[var(--border-subtle)]' : 'bg-[var(--bg-element)] border-transparent opacity-60'}`} style={{ borderColor: s.val ? s.color+'40' : undefined, background: s.val ? s.color+'10' : undefined }}>
+                    <input type="checkbox" checked={s.val} onChange={(e) => s.set(e.target.checked)} disabled={isPipelineRunning} className="w-3.5 h-3.5 rounded accent-[#0a84ff] shrink-0" />
+                    <span className="text-xs font-semibold text-[var(--text-main)] truncate">{s.label}</span>
                   </label>
                 ))}
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                <button type="button" onClick={() => { setSkipDownload(false); setSkipTimeline(false); setSkipCut(false); setSkipUpload(false); }} disabled={isPipelineRunning} className="py-3 sm:py-2 rounded-xl bg-[#0a84ff] text-white text-xs font-bold shadow-sm min-h-[44px]">Full Tuần Tự</button>
-                <button type="button" onClick={() => { setSkipDownload(true); setSkipTimeline(true); setSkipCut(true); setSkipUpload(false); }} disabled={isPipelineRunning} className="py-3 sm:py-2 rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] text-xs font-semibold text-[var(--text-main)] min-h-[44px]">Chỉ Upload</button>
+              <div className="grid grid-cols-2 gap-1.5">
+                <button type="button" onClick={() => { setSkipDownload(false); setSkipTimeline(false); setSkipCut(false); setSkipUpload(false); }} disabled={isPipelineRunning} className="py-1.5 px-2 rounded-lg bg-[#0a84ff] hover:bg-[#0071e3] text-white text-xs font-bold shadow-sm transition-colors">Full Tuần Tự</button>
+                <button type="button" onClick={() => { setSkipDownload(true); setSkipTimeline(true); setSkipCut(true); setSkipUpload(false); }} disabled={isPipelineRunning} className="py-1.5 px-2 rounded-lg bg-[var(--bg-input)] hover:bg-[var(--bg-highlight)] border border-[var(--border-subtle)] text-xs font-semibold text-[var(--text-main)] transition-colors">Chỉ Upload</button>
               </div>
-              {/* Advanced collapsible - mobile */}
-              <div className="rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] overflow-hidden">
-                <button type="button" onClick={() => setShowAdvancedMobile(!showAdvancedMobile)} className="w-full flex items-center justify-between px-3 py-3 text-xs font-semibold text-[var(--text-muted)] min-h-[44px]">
+              {/* Advanced collapsible */}
+              <div className="rounded-lg bg-[var(--bg-input)] border border-[var(--border-subtle)] overflow-hidden">
+                <button type="button" onClick={() => setShowAdvancedMobile(!showAdvancedMobile)} className="w-full flex items-center justify-between px-2.5 py-1.5 text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)]">
                   <span>Nâng cao</span>
-                  <span className={`transition-transform ${showAdvancedMobile ? 'rotate-180' : ''}`}>⌄</span>
+                  <span className={`transition-transform text-[10px] ${showAdvancedMobile ? 'rotate-180' : ''}`}>⌄</span>
                 </button>
                 {showAdvancedMobile && (
-                  <div className="px-3 pb-3 border-t border-[var(--border-subtle)] pt-3">
-                    <label className="flex items-center gap-3 cursor-pointer min-h-[44px]">
-                      <input type="checkbox" checked={dryRun} onChange={(e) => setDryRun(e.target.checked)} disabled={isPipelineRunning} className="w-5 h-5 rounded accent-[#0a84ff]" />
-                      <span className="text-sm sm:text-xs text-[var(--text-main)]">Dry-run (không đăng thật)</span>
+                  <div className="px-2.5 pb-2 border-t border-[var(--border-subtle)] pt-2">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="checkbox" checked={dryRun} onChange={(e) => setDryRun(e.target.checked)} disabled={isPipelineRunning} className="w-3.5 h-3.5 rounded accent-[#0a84ff]" />
+                      <span className="text-xs text-[var(--text-main)]">Dry-run (không đăng thật)</span>
                     </label>
                   </div>
                 )}

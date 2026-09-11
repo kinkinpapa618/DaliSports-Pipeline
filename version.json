@@ -10,7 +10,7 @@
     "Cắt clip tôn trọng lựa chọn Timeline Editor (selected), import video trực tiếp (file picker) + Agent trích xuất giải đấu từ link.",
     "Chuẩn hóa + sinh Chapters YouTube độc lập (/api/chapters/preview, /api/timeline/generate|normalize) và hiển thị trong description.",
     "Cấu hình tác vụ mobile-optimized: sticky header, 44px touch target, pill platform, collapsible nâng cao, 1 cột mobile.",
-    "Tunnel đổi stu.trongtaiso.com → server.trongtaiso.com, Cloudflare quick tunnel + .env CLOUDFLARE_CUSTOM_DOMAIN.",
+    "Cloudflare Tunnel: Chế độ Quick Tunnel động tạo URL ngẫu nhiên mới mỗi lần kích hoạt, không dùng domain cố định.",
     "Build prod vite 6 + electron 34.5.8, bản portable 81MB / setup 81MB / win-unpacked 302MB."
   ],
   "downloadUrl": "https://github.com/kinkinpapa618/DaliSports-Pipeline/releases/latest",

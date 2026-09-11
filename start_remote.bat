@@ -19,12 +19,11 @@ if not errorlevel 1 (
     echo [*] May chu DaliSports Studio da duoc khoi dong va dang chay!
     echo.
     echo ========================================================
-    echo  DOMAIN TU XA:  https://server.trongtaiso.com
     echo  MANG NOI BO:   http://localhost:8000
     echo ========================================================
     echo.
-    echo [*] Dang mo trinh duyet toi: https://server.trongtaiso.com
-    start https://server.trongtaiso.com
+    echo [*] Dang mo trinh duyet toi: http://localhost:8000
+    start http://localhost:8000
     goto :end
 )
 
@@ -35,7 +34,7 @@ if not errorlevel 1 (
     pm2 start "%~dp0system\remote_server.py" --name dalisports-remote --interpreter python
     pm2 save
     timeout /t 2 >nul
-    start https://server.trongtaiso.com
+    start http://localhost:8000
     goto :end
 )
 
