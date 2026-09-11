@@ -4,7 +4,7 @@ import {
   CheckCircle, AlertCircle, Shield, FolderOpen, Save,
   Eye, EyeOff, ExternalLink, RefreshCw, Sparkles, Sun, Moon,
   ArrowUpCircle, Download, Zap, Loader2, RotateCw,
-  Wifi, Copy, Check, QrCode
+  Wifi, Copy, Check, QrCode, Radio
 } from 'lucide-react';
 import { EnvConfig, UpdateCheckResult } from '../types';
 import { SkinMode } from '../hooks/useSkin';
@@ -30,6 +30,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const [fbPageId, setFbPageId] = useState('');
   const [fbAccessToken, setFbAccessToken] = useState('');
   const [updateUrl, setUpdateUrl] = useState('');
+  const [vmixExePath, setVmixExePath] = useState('C:\\Program Files (x86)\\vMix\\vMix64.exe');
+  const [fbPageUrl, setFbPageUrl] = useState('https://www.facebook.com/dalisportss');
+  const [vmixApiPort, setVmixApiPort] = useState('8088');
 
   // Update State
   const [checkingUpdate, setCheckingUpdate] = useState(false);
@@ -142,6 +145,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           setFbPageId(conf.FB_PAGE_ID || '');
           setFbAccessToken(conf.FB_PAGE_ACCESS_TOKEN || '');
           setUpdateUrl(conf.UPDATE_CHECK_URL || '');
+          setVmixExePath(conf.VMIX_EXE_PATH || 'C:\\Program Files (x86)\\vMix\\vMix64.exe');
+          setFbPageUrl(conf.FACEBOOK_PAGE_URL || 'https://www.facebook.com/dalisportss');
+          setVmixApiPort(conf.VMIX_API_PORT || '8088');
           setStatus({
             hasCookiesTxt: conf.hasCookiesTxt,
             hasClientSecrets: conf.hasClientSecrets,
@@ -201,6 +207,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           FB_PAGE_ID: fbPageId.trim(),
           FB_PAGE_ACCESS_TOKEN: fbAccessToken.trim(),
           UPDATE_CHECK_URL: updateUrl.trim(),
+          VMIX_EXE_PATH: vmixExePath.trim(),
+          FACEBOOK_PAGE_URL: fbPageUrl.trim(),
+          VMIX_API_PORT: vmixApiPort.trim(),
         });
 
         if (ok) {
@@ -220,7 +229,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col p-3 sm:p-6 space-y-3.5 sm:space-y-5 overflow-y-auto">
+    <div className="h-full flex flex-col p-3 sm:p-6 pb-24 sm:pb-6 space-y-3.5 sm:space-y-5 overflow-y-auto">
       {/* Header */}
       <div className="apple-card p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div className="flex items-center gap-2.5 sm:gap-3">
@@ -527,6 +536,70 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
       </div>
 
+      {/* Livestream & vMix Configuration Card */}
+      <div className="apple-card p-5 space-y-4">
+        <div className="flex items-center gap-2 pb-2 border-b border-[var(--border-subtle)]">
+          <Radio className="w-4 h-4 text-red-500" />
+          <h3 className="text-xs font-bold text-[var(--text-main)]">Cấu Hình Tự Động Hóa Livestream & vMix</h3>
+        </div>
+
+        <p className="text-xs text-[var(--text-muted)]">
+          Thiết lập đường dẫn phần mềm vMix, địa chỉ Facebook Fanpage nhận sự kiện trực tiếp và cổng giao tiếp Web API.
+        </p>
+
+        <div className="space-y-3 pt-1">
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 mb-1">
+              Đường dẫn phần mềm vMix64.exe (VMIX_EXE_PATH):
+            </label>
+            <input
+              type="text"
+              value={vmixExePath}
+              onChange={(e) => setVmixExePath(e.target.value)}
+              placeholder="C:\Program Files (x86)\vMix\vMix64.exe"
+              className="w-full px-3 py-2 rounded-lg bg-[var(--bg-input)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] font-mono focus:outline-none focus:border-[var(--accent-blue)]"
+            />
+            <p className="text-[10px] text-[var(--text-faint)] mt-1">
+              Mặc định: <code>C:\Program Files (x86)\vMix\vMix64.exe</code>. Dùng để tự động khởi động và load preset của từng giải.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-semibold text-slate-300 mb-1">
+                URL Fanpage Facebook Live (FACEBOOK_PAGE_URL):
+              </label>
+              <input
+                type="text"
+                value={fbPageUrl}
+                onChange={(e) => setFbPageUrl(e.target.value)}
+                placeholder="https://www.facebook.com/dalisportss"
+                className="w-full px-3 py-2 rounded-lg bg-[var(--bg-input)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] font-mono focus:outline-none focus:border-[var(--accent-blue)]"
+              />
+              <p className="text-[10px] text-[var(--text-faint)] mt-1">
+                Trình duyệt sẽ tự động điều hướng vào Live Producer của Page này để lấy Stream Key.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">
+                Port vMix Web API (VMIX_API_PORT):
+              </label>
+              <input
+                type="text"
+                value={vmixApiPort}
+                onChange={(e) => setVmixApiPort(e.target.value)}
+                placeholder="8088"
+                className="w-full px-3 py-2 rounded-lg bg-[var(--bg-input)] border border-[var(--border-subtle)] text-xs text-[var(--text-main)] font-mono focus:outline-none focus:border-[var(--accent-blue)]"
+              />
+              <p className="text-[10px] text-[var(--text-faint)] mt-1">
+                Mặc định: <code>8088</code>. vMix cần bật Web Controller trong Settings vMix.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Remote Access & Cloudflare Tunnel Card */}
       <div className="apple-card p-5 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[var(--border-subtle)]">
@@ -659,7 +732,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               </p>
             </div>
             <div className="text-[11px] font-mono text-[var(--text-muted)] shrink-0 pl-3">
-              Port: 8000 (API & Web)
+              Port: 8765 (API & Web)
             </div>
           </div>
         )}

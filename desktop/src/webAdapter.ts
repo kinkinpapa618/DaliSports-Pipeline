@@ -112,6 +112,147 @@ class WebApiAdapter {
     return await res.json();
   }
 
+  async createTournamentFull(payload: any): Promise<{ success: boolean; folderName: string; path: string; error?: string }> {
+    const res = await fetch(`${this.getBaseUrl()}/api/tournaments/create-full`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    return await res.json();
+  }
+
+  async buildVmixPreset(tournamentPath: string): Promise<any> {
+    const res = await fetch(`${this.getBaseUrl()}/api/livestream/build-preset`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tournamentPath }),
+    });
+    return await res.json();
+  }
+
+  async startLive(tournamentPath: string): Promise<{ success: boolean; error?: string }> {
+    const res = await fetch(`${this.getBaseUrl()}/api/livestream/start-live`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tournamentPath }),
+    });
+    return await res.json();
+  }
+
+  async syncDaliSports(): Promise<any> {
+    const res = await fetch(`${this.getBaseUrl()}/api/tournaments/sync-dalisports`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    return await res.json();
+  }
+
+  async importBackdrop(tournamentPath: string): Promise<{ success: boolean; dest?: string; error?: string }> {
+    return new Promise((resolve) => {
+      const inp = document.createElement('input');
+      inp.type = 'file';
+      inp.accept = 'image/png,image/jpeg,image/webp,image/bmp';
+      inp.onchange = async () => {
+        const file = inp.files?.[0];
+        if (!file) return resolve({ success: false, error: 'Đã hủy chọn file' });
+        const form = new FormData();
+        form.append('file', file);
+        try {
+          const res = await fetch(`${this.getBaseUrl()}/api/livestream/import-backdrop?tournamentPath=${encodeURIComponent(tournamentPath)}`, {
+            method: 'POST',
+            body: form,
+          });
+          const data = await res.json();
+          resolve(data);
+        } catch (e: any) {
+          resolve({ success: false, error: e.message });
+        }
+      };
+      inp.click();
+    });
+  }
+
+  async importLogos(tournamentPath: string): Promise<{ success: boolean; count?: number; error?: string }> {
+    return new Promise((resolve) => {
+      const inp = document.createElement('input');
+      inp.type = 'file';
+      inp.multiple = true;
+      inp.accept = 'image/png,image/jpeg,image/webp,image/svg+xml,image/bmp';
+      inp.onchange = async () => {
+        const files = inp.files;
+        if (!files || files.length === 0) return resolve({ success: false, error: 'Đã hủy chọn file' });
+        const form = new FormData();
+        for (let i = 0; i < files.length; i++) {
+          form.append('files', files[i]);
+        }
+        try {
+          const res = await fetch(`${this.getBaseUrl()}/api/livestream/import-logos?tournamentPath=${encodeURIComponent(tournamentPath)}`, {
+            method: 'POST',
+            body: form,
+          });
+          const data = await res.json();
+          resolve(data);
+        } catch (e: any) {
+          resolve({ success: false, error: e.message });
+        }
+      };
+      inp.click();
+    });
+  }
+
+  async importTvc(tournamentPath: string): Promise<{ success: boolean; count?: number; error?: string }> {
+    return new Promise((resolve) => {
+      const inp = document.createElement('input');
+      inp.type = 'file';
+      inp.multiple = true;
+      inp.accept = 'video/mp4,video/quicktime,video/x-matroska,video/avi,video/*,.mp4,.mov,.mkv,.ts';
+      inp.onchange = async () => {
+        const files = inp.files;
+        if (!files || files.length === 0) return resolve({ success: false, error: 'Đã hủy chọn file' });
+        const form = new FormData();
+        for (let i = 0; i < files.length; i++) {
+          form.append('files', files[i]);
+        }
+        try {
+          const res = await fetch(`${this.getBaseUrl()}/api/livestream/import-tvc?tournamentPath=${encodeURIComponent(tournamentPath)}`, {
+            method: 'POST',
+            body: form,
+          });
+          const data = await res.json();
+          resolve(data);
+        } catch (e: any) {
+          resolve({ success: false, error: e.message });
+        }
+      };
+      inp.click();
+    });
+  }
+
+  async importAthletes(tournamentPath: string): Promise<{ success: boolean; dest?: string; error?: string }> {
+    return new Promise((resolve) => {
+      const inp = document.createElement('input');
+      inp.type = 'file';
+      inp.accept = '.csv,.xlsx,.xls,.txt,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+      inp.onchange = async () => {
+        const file = inp.files?.[0];
+        if (!file) return resolve({ success: false, error: 'Đã hủy chọn file' });
+        const form = new FormData();
+        form.append('file', file);
+        try {
+          const res = await fetch(`${this.getBaseUrl()}/api/livestream/import-athletes?tournamentPath=${encodeURIComponent(tournamentPath)}`, {
+            method: 'POST',
+            body: form,
+          });
+          const data = await res.json();
+          resolve(data);
+        } catch (e: any) {
+          resolve({ success: false, error: e.message });
+        }
+      };
+      inp.click();
+    });
+  }
+
   // --- System ---
   async openFolder(dirPath: string): Promise<void> {
     await fetch(`${this.getBaseUrl()}/api/system/open-folder`, {

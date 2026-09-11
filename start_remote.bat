@@ -13,17 +13,17 @@ if not exist "%~dp0desktop\dist\index.html" (
     cd /d "%~dp0"
 )
 
-:: Kiem tra neu port 8000 da duoc mo boi PM2 hoac tien trinh khac
-netstat -ano | findstr :8000 | findstr LISTENING >nul 2>&1
+:: Kiem tra neu port 8765 da duoc mo boi PM2 hoac tien trinh khac
+netstat -ano | findstr :8765 | findstr LISTENING >nul 2>&1
 if not errorlevel 1 (
     echo [*] May chu DaliSports Studio da duoc khoi dong va dang chay!
     echo.
     echo ========================================================
-    echo  MANG NOI BO:   http://localhost:8000
+    echo  MANG NOI BO:   http://localhost:8765
     echo ========================================================
     echo.
-    echo [*] Dang mo trinh duyet toi: http://localhost:8000
-    start http://localhost:8000
+    echo [*] Dang mo trinh duyet toi: http://localhost:8765
+    start http://localhost:8765
     goto :end
 )
 
@@ -31,15 +31,15 @@ if not errorlevel 1 (
 where pm2 >nul 2>&1
 if not errorlevel 1 (
     echo [*] Khoi dong bang PM2 daemon...
-    pm2 start "%~dp0system\remote_server.py" --name dalisports-remote --interpreter python
+    pm2 start "%~dp0system\remote_server.py" --name dalisports-remote --interpreter python -- --port 8765 --tunnel
     pm2 save
     timeout /t 2 >nul
-    start http://localhost:8000
+    start http://localhost:8765
     goto :end
 )
 
-echo [*] Dang khoi dong May Chu Web...
-python "%~dp0system\remote_server.py" --port 8000
+echo [*] Dang khoi dong May Chu Web va Cloudflare Tunnel...
+python "%~dp0system\remote_server.py" --port 8765 --tunnel
 
 :end
 echo.

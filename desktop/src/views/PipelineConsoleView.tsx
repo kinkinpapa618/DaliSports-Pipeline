@@ -238,7 +238,7 @@ export const PipelineConsoleView: React.FC<PipelineConsoleViewProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col p-3 sm:p-6 space-y-3.5 sm:space-y-5 overflow-y-auto lg:overflow-hidden">
+    <div className="h-full flex flex-col p-3 sm:p-6 pb-24 sm:pb-6 space-y-3.5 sm:space-y-5 overflow-y-auto lg:overflow-hidden">
       {/* Top Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 apple-card p-3 sm:p-4 shrink-0">
         <div className="flex items-center gap-2.5 sm:gap-3">

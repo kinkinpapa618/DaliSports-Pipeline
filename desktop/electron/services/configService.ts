@@ -18,6 +18,9 @@ export class ConfigService {
       FB_PAGE_ID: '',
       FB_PAGE_ACCESS_TOKEN: '',
       UPDATE_CHECK_URL: '',
+      VMIX_EXE_PATH: 'C:\\Program Files (x86)\\vMix\\vMix64.exe',
+      FACEBOOK_PAGE_URL: 'https://www.facebook.com/dalisportss',
+      VMIX_API_PORT: '8088',
       hasCookiesTxt: fs.existsSync(path.join(this.workspaceRoot, 'cookies.txt')),
       hasClientSecrets: fs.existsSync(path.join(this.workspaceRoot, 'client_secrets.json')),
       hasYoutubeToken: fs.existsSync(path.join(this.workspaceRoot, 'yt_profile', 'upload_youtube_oauth.json')),
@@ -40,6 +43,9 @@ export class ConfigService {
             else if (key === 'FB_PAGE_ACCESS_TOKEN') config.FB_PAGE_ACCESS_TOKEN = val;
             else if (key === 'YOUTUBE_CLIENT_SECRETS_FILE') config.YOUTUBE_CLIENT_SECRETS_FILE = val;
             else if (key === 'UPDATE_CHECK_URL') config.UPDATE_CHECK_URL = val;
+            else if (key === 'VMIX_EXE_PATH') config.VMIX_EXE_PATH = val;
+            else if (key === 'FACEBOOK_PAGE_URL') config.FACEBOOK_PAGE_URL = val;
+            else if (key === 'VMIX_API_PORT') config.VMIX_API_PORT = val;
           }
         }
       } catch (err) {
@@ -66,6 +72,9 @@ export class ConfigService {
         FB_PAGE_ID: updates.FB_PAGE_ID,
         FB_PAGE_ACCESS_TOKEN: updates.FB_PAGE_ACCESS_TOKEN,
         UPDATE_CHECK_URL: updates.UPDATE_CHECK_URL,
+        VMIX_EXE_PATH: updates.VMIX_EXE_PATH,
+        FACEBOOK_PAGE_URL: updates.FACEBOOK_PAGE_URL,
+        VMIX_API_PORT: updates.VMIX_API_PORT,
       };
 
       const newLines: string[] = [];

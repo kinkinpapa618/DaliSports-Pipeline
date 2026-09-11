@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 
-import { MatchTimelineItem, PipelineLogMessage, PipelineOptions, SeoPreviewResult, TournamentInfo, UpdateCheckResult, ApplyUpdateResult } from '../electron/types';
+import { MatchTimelineItem, PipelineLogMessage, PipelineOptions, SeoPreviewResult, TournamentInfo, UpdateCheckResult, ApplyUpdateResult, CreateTournamentPayload, BuildVmixPresetResult } from '../electron/types';
 
 declare global {
   interface Window {
@@ -8,9 +8,17 @@ declare global {
       isWeb?: boolean;
       scanTournaments: () => Promise<TournamentInfo[]>;
       createTournament: (date: string, slug: string) => Promise<{ success: boolean; folderName: string; path: string; error?: string }>;
+      createTournamentFull: (payload: CreateTournamentPayload) => Promise<{ success: boolean; folderName: string; path: string; error?: string }>;
       updateTournament: (tournamentPath: string, updates: any) => Promise<{ success: boolean; error?: string }>;
       extractVideoInfo: (url: string) => Promise<any>;
       createTournamentFromVideo: (data: any) => Promise<{ success: boolean; folderName: string; path: string; error?: string }>;
+      buildVmixPreset: (tournamentPath: string) => Promise<BuildVmixPresetResult>;
+      startLive: (tournamentPath: string) => Promise<{ success: boolean; error?: string }>;
+      syncDaliSports: () => Promise<any>;
+      importBackdrop: (tournamentPath: string) => Promise<{ success: boolean; dest?: string; error?: string }>;
+      importLogos: (tournamentPath: string) => Promise<{ success: boolean; count?: number; error?: string }>;
+      importTvc: (tournamentPath: string) => Promise<{ success: boolean; count?: number; error?: string }>;
+      importAthletes: (tournamentPath: string) => Promise<{ success: boolean; dest?: string; error?: string }>;
       openFolder: (dirPath: string) => Promise<void>;
       openUrl: (url: string) => Promise<void>;
 

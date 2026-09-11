@@ -192,7 +192,7 @@ export const TimelineEditorView: React.FC<TimelineEditorViewProps> = ({
   };
 
   return (
-    <div className="h-full flex flex-col p-3 sm:p-6 space-y-3.5 sm:space-y-5 overflow-y-auto">
+    <div className="h-full flex flex-col p-3 sm:p-6 pb-24 sm:pb-6 space-y-3.5 sm:space-y-5 overflow-y-auto">
       {/* Top Header & Tournament Selector */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4 apple-card p-3 sm:p-4">
         <div className="flex items-center gap-2.5 sm:gap-3">

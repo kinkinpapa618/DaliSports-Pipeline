@@ -46,8 +46,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[var(--bg-sidebar)]/95 backdrop-blur-xl border-t border-[var(--border-subtle)] pb-[env(safe-area-inset-bottom,0px)] shadow-[0_-4px_20px_rgba(0,0,0,0.3)] transition-colors">
-      <div className="grid grid-cols-5 h-16 items-center px-1">
+    <nav className="md:hidden shrink-0 w-full z-30 bg-[var(--bg-sidebar)]/95 backdrop-blur-xl border-t border-[var(--border-subtle)] pb-[env(safe-area-inset-bottom,0px)] shadow-[0_-4px_20px_rgba(0,0,0,0.3)] transition-colors select-none">
+      <div className="grid grid-cols-5 h-14 items-center px-1">
         {items.map((item) => {
           const Icon = item.icon;
           const isActive = currentTab === item.id;
@@ -64,13 +64,13 @@ export const BottomNav: React.FC<BottomNavProps> = ({
             >
               <div className="relative flex items-center justify-center">
                 <div
-                  className={`w-9 h-7 rounded-full flex items-center justify-center transition-all ${
+                  className={`w-8 h-6 rounded-full flex items-center justify-center transition-all ${
                     isActive
                       ? 'bg-[var(--accent-blue)]/15 text-[var(--accent-blue)]'
                       : 'text-[var(--text-muted)]'
                   }`}
                 >
-                  <Icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5]' : 'stroke-2'}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? 'stroke-[2.5]' : 'stroke-2'}`} />
                 </div>
 
                 {item.badge !== undefined && (
@@ -92,7 +92,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               </span>
 
               {isActive && (
-                <span className="absolute bottom-1 w-6 h-0.5 rounded-full bg-[var(--accent-blue)]" />
+                <span className="absolute bottom-0.5 w-6 h-0.5 rounded-full bg-[var(--accent-blue)]" />
               )}
             </button>
           );

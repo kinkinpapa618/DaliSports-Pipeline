@@ -137,6 +137,62 @@ function registerIpcHandlers() {
     return tournamentService.createTournamentFromVideo(data);
   });
 
+  ipcMain.handle('tournaments:createFull', async (_, payload: any) => {
+    return tournamentService.createTournamentFull(payload);
+  });
+
+  ipcMain.handle('livestream:buildPreset', async (_, tournamentPath: string) => {
+    return tournamentService.buildVmixPreset(tournamentPath);
+  });
+
+  ipcMain.handle('livestream:startLive', async (_, tournamentPath: string) => {
+    return tournamentService.startLive(tournamentPath);
+  });
+
+  ipcMain.handle('tournaments:syncDaliSports', async () => {
+    return tournamentService.syncDaliSports();
+  });
+
+  ipcMain.handle('livestream:importBackdrop', async (_, tournamentPath: string) => {
+    const res = await dialog.showOpenDialog(mainWindow!, {
+      properties: ['openFile'],
+      filters: [{ name: 'Hình ảnh Backdrop', extensions: ['png', 'jpg', 'jpeg', 'webp', 'bmp'] }],
+      title: 'Chọn file ảnh Backdrop giải đấu',
+    });
+    if (res.canceled || !res.filePaths[0]) return { success: false, error: 'Đã hủy chọn file' };
+    return tournamentService.importBackdropFile(tournamentPath, res.filePaths[0]);
+  });
+
+  ipcMain.handle('livestream:importLogos', async (_, tournamentPath: string) => {
+    const res = await dialog.showOpenDialog(mainWindow!, {
+      properties: ['openFile', 'multiSelections'],
+      filters: [{ name: 'Logo nhà tài trợ', extensions: ['png', 'jpg', 'jpeg', 'webp', 'svg', 'bmp'] }],
+      title: 'Chọn các file ảnh Logo nhà tài trợ',
+    });
+    if (res.canceled || !res.filePaths.length) return { success: false, error: 'Đã hủy chọn file' };
+    return tournamentService.importLogosFiles(tournamentPath, res.filePaths);
+  });
+
+  ipcMain.handle('livestream:importTvc', async (_, tournamentPath: string) => {
+    const res = await dialog.showOpenDialog(mainWindow!, {
+      properties: ['openFile', 'multiSelections'],
+      filters: [{ name: 'Video TVC quảng cáo', extensions: ['mp4', 'mov', 'avi', 'mkv', 'ts'] }],
+      title: 'Chọn các file video TVC quảng cáo',
+    });
+    if (res.canceled || !res.filePaths.length) return { success: false, error: 'Đã hủy chọn file' };
+    return tournamentService.importTvcFiles(tournamentPath, res.filePaths);
+  });
+
+  ipcMain.handle('livestream:importAthletes', async (_, tournamentPath: string) => {
+    const res = await dialog.showOpenDialog(mainWindow!, {
+      properties: ['openFile'],
+      filters: [{ name: 'Danh sách VĐV', extensions: ['xlsx', 'xls', 'csv', 'txt'] }],
+      title: 'Chọn file danh sách vận động viên',
+    });
+    if (res.canceled || !res.filePaths[0]) return { success: false, error: 'Đã hủy chọn file' };
+    return tournamentService.importAthletesFile(tournamentPath, res.filePaths[0]);
+  });
+
   // System
   ipcMain.handle('system:openFolder', async (_, dirPath: string) => {
     if (fs.existsSync(dirPath)) {
@@ -273,9 +329,9 @@ function registerIpcHandlers() {
   let remoteTunnelError: string | null = null;
 
   const stopRemoteServer = async () => {
-    // 1. If remote_server.py is running on port 8000, request tunnel stop
+    // 1. If remote_server.py is running on port 8765, request tunnel stop
     try {
-      await fetch('http://127.0.0.1:8000/api/tunnel/stop', { 
+      await fetch('http://127.0.0.1:8765/api/tunnel/stop', { 
         method: 'POST', 
         signal: AbortSignal.timeout(2000) 
       });
@@ -298,9 +354,9 @@ function registerIpcHandlers() {
   };
 
   ipcMain.handle('tunnel:status', async () => {
-    // Check if remote_server API is active on port 8000
+    // Check if remote_server API is active on port 8765
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/tunnel/status', { 
+      const res = await fetch('http://127.0.0.1:8765/api/tunnel/status', { 
         signal: AbortSignal.timeout(2000) 
       });
       if (res.ok) {
@@ -326,9 +382,9 @@ function registerIpcHandlers() {
     // Always stop previous tunnel first to ensure a new dynamic URL is generated
     await stopRemoteServer();
 
-    // 1. Try starting tunnel via existing local remote server on port 8000
+    // 1. Try starting tunnel via existing local remote server on port 8765
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/tunnel/start', {
+      const res = await fetch('http://127.0.0.1:8765/api/tunnel/start', {
         method: 'POST',
         signal: AbortSignal.timeout(18000),
       });
@@ -346,7 +402,7 @@ function registerIpcHandlers() {
     const serverScript = path.join(WORKSPACE_ROOT, 'system', 'remote_server.py');
     return new Promise((resolve) => {
       try {
-        remoteServerProc = spawn('python', ['-u', serverScript, '--tunnel', '--port', '8000'], {
+        remoteServerProc = spawn('python', ['-u', serverScript, '--tunnel', '--port', '8765'], {
           cwd: WORKSPACE_ROOT,
           env: {
             ...process.env,

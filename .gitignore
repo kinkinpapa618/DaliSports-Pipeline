@@ -35,6 +35,7 @@ ENV/
 # Node & Frontend (Desktop app)
 desktop/node_modules/
 desktop/dist/
+desktop/dist_old/
 desktop/dist-electron/
 desktop/dist-app/
 desktop/release/
@@ -73,6 +74,8 @@ fine_match_scan.txt
 scan_early_matches.txt
 intro_card_timestamps.txt
 mota.txt.txt
+fb_step*.png
+
 
 # OS & Editor
 .DS_Store

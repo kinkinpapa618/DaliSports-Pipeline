@@ -101,7 +101,9 @@ def _run_tunnel_process(port: int):
         state.tunnel_error = "Không tìm thấy cloudflared.exe trên hệ thống."
         return
 
-    cmd = [bin_path, "tunnel", "--url", f"http://127.0.0.1:{port}"]
+    # Bắt buộc dùng --config NUL (Windows) để bỏ qua file ~/.cloudflared/config.yml có sẵn trên máy
+    null_device = "NUL" if sys.platform == "win32" else "/dev/null"
+    cmd = [bin_path, "tunnel", "--config", null_device, "--url", f"http://127.0.0.1:{port}"]
 
     try:
         proc = subprocess.Popen(
@@ -129,7 +131,7 @@ def _run_tunnel_process(port: int):
         state.tunnel_error = str(e)
         print(f"[Tunnel Error] {e}")
 
-def start_tunnel_service(port: int = 8000) -> bool:
+def start_tunnel_service(port: int = 8765) -> bool:
     # Luon dung tien trinh cu truoc de moi lan bat se tao ra mot link tunnel moi
     stop_tunnel_service()
     time.sleep(0.5)
@@ -195,7 +197,7 @@ async def get_tunnel_status():
     }
 
 @app.post("/api/tunnel/start")
-async def api_start_tunnel(port: int = 8000):
+async def api_start_tunnel(port: int = 8765):
     ok = start_tunnel_service(port)
     return {
         "success": ok,
@@ -254,6 +256,9 @@ async def list_tournaments():
     tournament_dir_regex = re.compile(r"^\d{4}-\d{2}-\d{2}_.+$")
     entries = sorted(os.listdir(WORKSPACE_ROOT), reverse=True)
 
+    img_exts = re.compile(r"\.(png|jpg|jpeg|webp|bmp)$", re.I)
+    vid_exts = re.compile(r"\.(mp4|mov|avi|mkv|ts)$", re.I)
+
     for entry in entries:
         folder_path = os.path.join(WORKSPACE_ROOT, entry)
         if not os.path.isdir(folder_path):
@@ -274,11 +279,15 @@ async def list_tournaments():
         elif "tennis" in lower_folder:
             sport_type = "tennis"
 
-        info_file = os.path.join(folder_path, "tournament_info.json")
+        info_file = os.path.join(folder_path, "dieu_hanh", "tournament_info.json")
+        if not os.path.exists(info_file):
+            info_file = os.path.join(folder_path, "tournament_info.json")
+
         source_url = None
         court = None
         category = None
         sponsor = None
+        description = None
         if os.path.exists(info_file):
             try:
                 with open(info_file, "r", encoding="utf-8") as f:
@@ -289,6 +298,7 @@ async def list_tournaments():
                     court = info.get("court")
                     category = info.get("category")
                     sponsor = info.get("sponsor")
+                    description = info.get("description")
             except Exception:
                 pass
 
@@ -299,7 +309,7 @@ async def list_tournaments():
         video_size_mb = 0
         if os.path.exists(video_dir):
             files = os.listdir(video_dir)
-            video_files = [f for f in files if re.search(r"\.(mp4|mkv|mov|ts|avi)$", f, re.I)]
+            video_files = [f for f in files if vid_exts.search(f)]
             if video_files:
                 has_video = True
                 video_file = os.path.join("video", video_files[0])
@@ -336,13 +346,58 @@ async def list_tournaments():
         uploaded_yt = False
         uploaded_fb = False
         root_upload_log = os.path.join(WORKSPACE_ROOT, "upload_source_log.txt")
-        if os.path.exists(root_upload_log):
-            try:
-                with open(root_upload_log, "r", encoding="utf-8", errors="ignore") as f:
-                    log_text = f.read()
-                    uploaded_yt = entry in log_text
-            except Exception:
-                pass
+        t_upload_log = os.path.join(folder_path, "upload_source_log.txt")
+        for log_path in [root_upload_log, t_upload_log]:
+            if os.path.exists(log_path):
+                try:
+                    with open(log_path, "r", encoding="utf-8", errors="ignore") as f:
+                        txt = f.read()
+                        if entry in txt or "http" in txt:
+                            uploaded_yt = True
+                except Exception:
+                    pass
+
+        fb_log = os.path.join(folder_path, "upload_fb_log.txt")
+        if os.path.exists(fb_log):
+            uploaded_fb = True
+
+        # Check Livestream assets
+        livestream_dir = os.path.join(folder_path, "livestream")
+        has_preset_vmix = os.path.exists(os.path.join(livestream_dir, "preset.vmix"))
+
+        has_backdrop = False
+        backdrop_path = None
+        backdrop_dir = os.path.join(livestream_dir, "backdrop")
+        if os.path.exists(backdrop_dir):
+            b_files = [f for f in os.listdir(backdrop_dir) if img_exts.search(f)]
+            if b_files:
+                has_backdrop = True
+                backdrop_path = os.path.join("livestream", "backdrop", b_files[0])
+        if not has_backdrop and os.path.exists(livestream_dir):
+            l_files = [f for f in os.listdir(livestream_dir) if img_exts.search(f)]
+            if l_files:
+                has_backdrop = True
+                backdrop_path = os.path.join("livestream", l_files[0])
+
+        logos_count = 0
+        logos_dir = os.path.join(livestream_dir, "logos")
+        if os.path.exists(logos_dir):
+            logos_count = len([f for f in os.listdir(logos_dir) if img_exts.search(f)])
+
+        tvc_count = 0
+        tvc_dir = os.path.join(livestream_dir, "tvc")
+        if os.path.exists(tvc_dir):
+            tvc_count = len([f for f in os.listdir(tvc_dir) if vid_exts.search(f)])
+
+        dieu_hanh_dir = os.path.join(folder_path, "dieu_hanh")
+        has_athletes_list = False
+        has_dieule = False
+        if os.path.exists(dieu_hanh_dir):
+            dh_files = os.listdir(dieu_hanh_dir)
+            has_athletes_list = any(re.search(r"vdv|danh_sach|athletes", f, re.I) and re.search(r"\.(xlsx|xls|csv|txt)$", f, re.I) for f in dh_files)
+            has_dieule = any(re.search(r"dieu_le|quy_dinh|rules", f, re.I) and re.search(r"\.(txt|docx|doc|pdf)$", f, re.I) for f in dh_files)
+
+        has_start_bat = os.path.exists(os.path.join(folder_path, "START.bat"))
 
         results.append({
             "id": entry,
@@ -355,6 +410,7 @@ async def list_tournaments():
             "court": court,
             "category": category,
             "sponsor": sponsor,
+            "description": description,
             "hasVideo": has_video,
             "videoFile": video_file,
             "videoSizeMb": video_size_mb,
@@ -365,6 +421,16 @@ async def list_tournaments():
             "clipCount": clip_count,
             "uploadedYoutube": uploaded_yt,
             "uploadedFacebook": uploaded_fb,
+            "hasPresetVmix": has_preset_vmix,
+            "hasBackdrop": has_backdrop,
+            "backdropPath": backdrop_path,
+            "hasLogos": logos_count > 0,
+            "logosCount": logos_count,
+            "hasTvc": tvc_count > 0,
+            "tvcCount": tvc_count,
+            "hasAthletesList": has_athletes_list,
+            "hasDieule": has_dieule,
+            "hasStartBat": has_start_bat,
         })
 
     return results
@@ -391,6 +457,82 @@ async def create_tournament(payload: Dict[str, Any] = Body(...)):
 
     return {"success": True, "folderName": folder_name, "path": t_path}
 
+@app.post("/api/tournaments/create-full")
+async def create_tournament_full(payload: Dict[str, Any] = Body(...)):
+    name = payload.get("name", "").strip()
+    if not name:
+        raise HTTPException(status_code=400, detail="Tên giải đấu là bắt buộc")
+
+    date_str = payload.get("date") or time.strftime("%Y-%m-%d")
+    sport_type = payload.get("sportType") or "badminton"
+    court = payload.get("court") or "Sân 1"
+    sponsor = payload.get("sponsor") or ""
+    description = payload.get("description") or f"Trực tiếp và phát sóng giải {name}."
+
+    # Sinh slug
+    clean_slug = re.sub(r"^\d{4}-\d{2}-\d{2}[_-]", "", name.strip())
+    # Bỏ dấu tiếng Việt cơ bản
+    clean_slug = re.sub(r"[àáạảãâầấậẩẫăằắặẳẵ]", "a", clean_slug, flags=re.I)
+    clean_slug = re.sub(r"[èéẹẻẽêềếệểễ]", "e", clean_slug, flags=re.I)
+    clean_slug = re.sub(r"[ìíịỉĩ]", "i", clean_slug, flags=re.I)
+    clean_slug = re.sub(r"[òóọỏõôồốộổỗơờớợởỡ]", "o", clean_slug, flags=re.I)
+    clean_slug = re.sub(r"[ùúụủũưừứựửữ]", "u", clean_slug, flags=re.I)
+    clean_slug = re.sub(r"[ỳýỵỷỹ]", "y", clean_slug, flags=re.I)
+    clean_slug = re.sub(r"[đ]", "d", clean_slug, flags=re.I)
+    clean_slug = re.sub(r"[^a-zA-Z0-9]+", "-", clean_slug).strip("-").lower()
+    if not clean_slug:
+        clean_slug = "giai-dau"
+
+    folder_name = f"{date_str}_{clean_slug}"
+    t_path = os.path.join(WORKSPACE_ROOT, folder_name)
+
+    # Tạo các thư mục chuẩn
+    os.makedirs(os.path.join(t_path, "dieu_hanh"), exist_ok=True)
+    os.makedirs(os.path.join(t_path, "livestream", "backdrop"), exist_ok=True)
+    os.makedirs(os.path.join(t_path, "livestream", "logos"), exist_ok=True)
+    os.makedirs(os.path.join(t_path, "livestream", "tvc"), exist_ok=True)
+    os.makedirs(os.path.join(t_path, "video"), exist_ok=True)
+    os.makedirs(os.path.join(t_path, "clips"), exist_ok=True)
+
+    info_path = os.path.join(t_path, "dieu_hanh", "tournament_info.json")
+    with open(info_path, "w", encoding="utf-8") as f:
+        json.dump({
+            "name": name,
+            "slug": clean_slug,
+            "date": date_str,
+            "sportType": sport_type,
+            "description": description,
+            "court": court,
+            "sponsor": sponsor,
+            "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        }, f, ensure_ascii=False, indent=2)
+
+    # Copy files mẫu nếu có
+    samples_dir = os.path.join(WORKSPACE_ROOT, "templates", "samples")
+    if os.path.exists(samples_dir):
+        dl = os.path.join(samples_dir, "dieu_le.txt")
+        if os.path.exists(dl):
+            shutil.copy2(dl, os.path.join(t_path, "dieu_hanh", "dieu_le.txt"))
+        vdv = os.path.join(samples_dir, "danh_sach_vdv.csv")
+        if os.path.exists(vdv):
+            shutil.copy2(vdv, os.path.join(t_path, "dieu_hanh", "danh_sach_vdv.csv"))
+        bat = os.path.join(samples_dir, "START.bat")
+        if os.path.exists(bat):
+            shutil.copy2(bat, os.path.join(t_path, "START.bat"))
+
+    # Gọi sinh preset.vmix
+    script = os.path.join(WORKSPACE_ROOT, "system", "vmix_preset_builder.py")
+    try:
+        proc = await asyncio.create_subprocess_exec(
+            sys.executable, "-u", script, "--tournament", t_path, "--json",
+            stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, cwd=WORKSPACE_ROOT
+        )
+        await proc.communicate()
+    except Exception:
+        pass
+
+    return {"success": True, "folderName": folder_name, "path": t_path}
+
 @app.post("/api/tournaments/update")
 async def update_tournament(payload: Dict[str, Any] = Body(...)):
     t_path = payload.get("tournamentPath", "")
@@ -398,7 +540,10 @@ async def update_tournament(payload: Dict[str, Any] = Body(...)):
     if not t_path or not os.path.exists(t_path):
         raise HTTPException(status_code=404, detail="Tournament folder not found")
 
-    info_file = os.path.join(t_path, "tournament_info.json")
+    info_file = os.path.join(t_path, "dieu_hanh", "tournament_info.json")
+    if not os.path.exists(info_file):
+        info_file = os.path.join(t_path, "tournament_info.json")
+
     curr = {}
     if os.path.exists(info_file):
         try:
@@ -623,6 +768,179 @@ async def import_video_file(tournamentPath: str = Query(...), file: UploadFile =
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# ============================================================
+# Livestream Assets Import & vMix Presets
+# ============================================================
+
+from typing import List
+
+@app.post("/api/livestream/import-backdrop")
+async def import_backdrop_api(tournamentPath: str = Query(...), file: UploadFile = File(...)):
+    """Upload ảnh Backdrop cho giải đấu"""
+    if not tournamentPath or not os.path.exists(tournamentPath):
+        raise HTTPException(status_code=404, detail="Tournament path not found")
+    backdrop_dir = os.path.join(tournamentPath, "livestream", "backdrop")
+    os.makedirs(backdrop_dir, exist_ok=True)
+
+    # Xóa ảnh backdrop cũ nếu có
+    for f in os.listdir(backdrop_dir):
+        try:
+            os.unlink(os.path.join(backdrop_dir, f))
+        except Exception:
+            pass
+
+    filename = file.filename or "backdrop.png"
+    dest = os.path.join(backdrop_dir, filename)
+    try:
+        content = await file.read()
+        with open(dest, "wb") as f:
+            f.write(content)
+
+        # Tự động cập nhật preset vMix
+        script = os.path.join(WORKSPACE_ROOT, "system", "vmix_preset_builder.py")
+        proc = await asyncio.create_subprocess_exec(
+            sys.executable, "-u", script, "--tournament", tournamentPath, "--json",
+            stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, cwd=WORKSPACE_ROOT
+        )
+        await proc.communicate()
+
+        return {"success": True, "dest": dest, "filename": filename}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/livestream/import-logos")
+async def import_logos_api(tournamentPath: str = Query(...), files: List[UploadFile] = File(...)):
+    """Upload nhiều file ảnh Logo nhà tài trợ"""
+    if not tournamentPath or not os.path.exists(tournamentPath):
+        raise HTTPException(status_code=404, detail="Tournament path not found")
+    logos_dir = os.path.join(tournamentPath, "livestream", "logos")
+    os.makedirs(logos_dir, exist_ok=True)
+
+    count = 0
+    try:
+        for f in files:
+            dest = os.path.join(logos_dir, f.filename or f"logo_{count}.png")
+            content = await f.read()
+            with open(dest, "wb") as out:
+                out.write(content)
+            count += 1
+
+        # Cập nhật preset vMix
+        script = os.path.join(WORKSPACE_ROOT, "system", "vmix_preset_builder.py")
+        proc = await asyncio.create_subprocess_exec(
+            sys.executable, "-u", script, "--tournament", tournamentPath, "--json",
+            stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, cwd=WORKSPACE_ROOT
+        )
+        await proc.communicate()
+
+        return {"success": True, "count": count}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/livestream/import-tvc")
+async def import_tvc_api(tournamentPath: str = Query(...), files: List[UploadFile] = File(...)):
+    """Upload nhiều file video TVC quảng cáo"""
+    if not tournamentPath or not os.path.exists(tournamentPath):
+        raise HTTPException(status_code=404, detail="Tournament path not found")
+    tvc_dir = os.path.join(tournamentPath, "livestream", "tvc")
+    os.makedirs(tvc_dir, exist_ok=True)
+
+    count = 0
+    try:
+        for f in files:
+            dest = os.path.join(tvc_dir, f.filename or f"tvc_{count}.mp4")
+            content = await f.read()
+            with open(dest, "wb") as out:
+                out.write(content)
+            count += 1
+
+        # Cập nhật preset vMix
+        script = os.path.join(WORKSPACE_ROOT, "system", "vmix_preset_builder.py")
+        proc = await asyncio.create_subprocess_exec(
+            sys.executable, "-u", script, "--tournament", tournamentPath, "--json",
+            stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, cwd=WORKSPACE_ROOT
+        )
+        await proc.communicate()
+
+        return {"success": True, "count": count}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/livestream/import-athletes")
+async def import_athletes_api(tournamentPath: str = Query(...), file: UploadFile = File(...)):
+    """Upload file danh sách VĐV (CSV, Excel)"""
+    if not tournamentPath or not os.path.exists(tournamentPath):
+        raise HTTPException(status_code=404, detail="Tournament path not found")
+    dieu_hanh_dir = os.path.join(tournamentPath, "dieu_hanh")
+    os.makedirs(dieu_hanh_dir, exist_ok=True)
+
+    filename = file.filename or "danh_sach_vdv.csv"
+    dest = os.path.join(dieu_hanh_dir, filename)
+    try:
+        content = await file.read()
+        with open(dest, "wb") as f:
+            f.write(content)
+        return {"success": True, "dest": dest, "filename": filename}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/livestream/build-preset")
+async def build_preset_api(payload: Dict[str, Any] = Body(...)):
+    """Xuất preset vMix theo giải đấu"""
+    t_path = payload.get("tournamentPath", "")
+    if not t_path or not os.path.exists(t_path):
+        raise HTTPException(status_code=404, detail="Tournament not found")
+    script = os.path.join(WORKSPACE_ROOT, "system", "vmix_preset_builder.py")
+    proc = await asyncio.create_subprocess_exec(
+        sys.executable, "-u", script, "--tournament", t_path, "--json",
+        stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, cwd=WORKSPACE_ROOT
+    )
+    stdout, stderr = await proc.communicate()
+    try:
+        out_str = stdout.decode(errors="ignore").strip()
+        parsed = json.loads(out_str)
+        return parsed
+    except Exception:
+        return {"success": proc.returncode == 0, "presetPath": os.path.join(t_path, "livestream", "preset.vmix")}
+
+@app.post("/api/livestream/start-live")
+async def start_live_api(payload: Dict[str, Any] = Body(...)):
+    """Khởi động 1-Click Live"""
+    t_path = payload.get("tournamentPath", "")
+    if not t_path or not os.path.exists(t_path):
+        raise HTTPException(status_code=404, detail="Tournament not found")
+    bat_path = os.path.join(t_path, "START.bat")
+    if os.path.exists(bat_path):
+        import subprocess
+        subprocess.Popen(["cmd.exe", "/c", "start", "cmd.exe", "/k", bat_path], cwd=t_path)
+        return {"success": True}
+    script = os.path.join(WORKSPACE_ROOT, "system", "start_live_orchestrator.py")
+    import subprocess
+    subprocess.Popen(["cmd.exe", "/c", "start", "cmd.exe", "/k", sys.executable, script, "--tournament", t_path], cwd=WORKSPACE_ROOT)
+    return {"success": True}
+
+@app.post("/api/tournaments/sync-dalisports")
+async def sync_dalisports_api():
+    """Đồng bộ các giải đấu Sắp diễn ra từ app.dalisports.vn"""
+    script = os.path.join(WORKSPACE_ROOT, "system", "sync_dalisports.py")
+    proc = await asyncio.create_subprocess_exec(
+        sys.executable, "-u", script,
+        stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE, cwd=WORKSPACE_ROOT
+    )
+    stdout, stderr = await proc.communicate()
+    out_str = stdout.decode(errors="ignore").strip()
+    marker = "[JSON RESULT]"
+    if marker in out_str:
+        json_part = out_str.split(marker)[-1].strip()
+        try:
+            return json.loads(json_part)
+        except Exception:
+            pass
+    try:
+        return json.loads(out_str)
+    except Exception:
+        return {"success": proc.returncode == 0, "raw": out_str, "error": stderr.decode(errors="ignore")}
+
 @app.post("/api/timeline/generate")
 async def generate_timeline_api(payload: Dict[str, Any] = Body(...)):
     """Bước 2 độc lập: chạy Gemini Timeline quét banner scoreboard"""
@@ -813,7 +1131,7 @@ def main():
     import socket
 
     parser = argparse.ArgumentParser(description="DaliSports Studio Remote Server")
-    parser.add_argument("--port", type=int, default=8000, help="Port to listen on (default: 8000)")
+    parser.add_argument("--port", type=int, default=8765, help="Port to listen on (default: 8765)")
     parser.add_argument("--host", type=str, default="0.0.0.0", help="Host interface (default: 0.0.0.0)")
     parser.add_argument("--tunnel", action="store_true", help="Automatically start Cloudflare Tunnel")
     args = parser.parse_args()

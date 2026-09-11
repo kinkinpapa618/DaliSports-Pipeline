@@ -477,6 +477,106 @@ class GeminiRotator:
         }
 
     @classmethod
+    def generate_text_sync(
+        cls,
+        prompt_text: str,
+        system_instruction: Optional[str] = None,
+        custom_key: Optional[str] = None,
+        models_to_try: Optional[List[str]] = None,
+        timeout: float = 30.0
+    ) -> Tuple[Optional[str], Dict[str, Any]]:
+        """
+        Gửi yêu cầu phân tích văn bản đồng bộ (Sync) qua cơ chế xoay tua API Key & Model.
+        """
+        all_keys = cls.get_all_keys(custom_key)
+        models = models_to_try or RECOMMENDED_GEMINI_MODELS
+        ordered_keys = cls._get_ordered_keys(all_keys)
+
+        full_prompt = f"{system_instruction}\n\n{prompt_text}" if system_instruction else prompt_text
+        payload = {
+            "contents": [
+                {
+                    "parts": [{"text": full_prompt}]
+                }
+            ],
+            "generationConfig": {
+                "responseMimeType": "application/json",
+                "temperature": 0.2
+            }
+        }
+
+        last_error = None
+        attempt_count = 0
+
+        with httpx.Client(timeout=timeout) as client:
+            for key in ordered_keys:
+                masked_k = cls.mask_key(key)
+                for model_name in models:
+                    attempt_count += 1
+                    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={key}"
+                    try:
+                        resp = client.post(
+                            url,
+                            headers={"Content-Type": "application/json"},
+                            json=payload
+                        )
+                        if resp.status_code == 200:
+                            data = resp.json()
+                            if "candidates" in data and len(data["candidates"]) > 0:
+                                cand = data["candidates"][0]
+                                if "content" in cand and "parts" in cand["content"] and len(cand["content"]["parts"]) > 0:
+                                    content_text = cand["content"]["parts"][0].get("text", "")
+                                    if content_text:
+                                        cls.mark_key_result(key, success=True)
+                                        return content_text, {
+                                            "status": "success",
+                                            "model_used": model_name,
+                                            "key_used": masked_k,
+                                            "attempts": attempt_count
+                                        }
+
+                        status_code = resp.status_code
+                        err_msg = resp.text[:200]
+                        cls.mark_key_result(key, success=False, error_code=status_code, error_msg=err_msg)
+                        last_error = f"[{model_name} | {masked_k}] HTTP {status_code}: {err_msg}"
+
+                        if status_code in [403, 400] and ("API_KEY_INVALID" in err_msg or "IP address restriction" in err_msg):
+                            break
+                    except Exception as e:
+                        last_error = f"[{model_name} | {masked_k}] Connection error: {str(e)}"
+                        cls.mark_key_result(key, success=False, error_code=500, error_msg=str(e))
+                        continue
+
+        return None, {
+            "status": "error",
+            "last_error": last_error or "Không thể kết nối tới Google Gemini",
+            "attempts": attempt_count
+        }
+
+    @classmethod
+    def call_gemini_json(
+        cls,
+        prompt_text: str,
+        system_instruction: Optional[str] = None,
+        custom_key: Optional[str] = None,
+        timeout: float = 30.0
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Gọi Gemini đồng bộ trả về Dict JSON. Tự động xoay tua key và làm sạch markdown nếu có.
+        """
+        text, meta = cls.generate_text_sync(prompt_text, system_instruction, custom_key, timeout=timeout)
+        if not text:
+            return None
+        import re
+        import json
+        clean = re.sub(r"^```(?:json)?\s*", "", text.strip(), flags=re.MULTILINE)
+        clean = re.sub(r"\s*```$", "", clean.strip(), flags=re.MULTILINE)
+        try:
+            return json.loads(clean)
+        except Exception:
+            return None
+
+    @classmethod
     def get_pool_status(cls) -> Dict[str, Any]:
         """Lấy thông tin trạng thái tải và danh sách key trong Pool"""
         all_keys = cls.get_all_keys()

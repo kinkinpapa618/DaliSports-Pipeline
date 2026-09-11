@@ -1,0 +1,33 @@
+<Preset version="27.0.0.0">
+  <Inputs>
+    <!-- 1: Video Capture / NDI / Camera -->
+    <Input key="input-cam1" number="1" type="Camera" title="Camera 1" state="Paused" position="0" duration="0" loop="False" muted="False" volume="100" balance="0" solo="False" audiobuses="M">
+    </Input>
+    <!-- 2: Backdrop Giải Đấu -->
+    <Input key="input-backdrop" number="2" type="Image" title="Backdrop Giai Dau" state="Completed" position="0" duration="0" loop="False" muted="True" volume="100" balance="0" solo="False" audiobuses="M">
+      {{BACKDROP_FILE}}
+    </Input>
+    <!-- 3: Logo Đơn Vị Tài Trợ -->
+    <Input key="input-logos" number="3" type="List" title="Logo Nha Tai Tro" state="Paused" position="0" duration="0" loop="True" muted="True" volume="100" balance="0" solo="False" audiobuses="M">
+      {{LOGOS_ITEMS}}
+    </Input>
+    <!-- 4: Video TVC Quảng Cáo Giữa Hiệp -->
+    <Input key="input-tvc" number="4" type="List" title="TVC Quang Cao" state="Paused" position="0" duration="0" loop="False" muted="False" volume="100" balance="0" solo="False" audiobuses="M">
+      {{TVC_ITEMS}}
+    </Input>
+    <!-- 5: Title / Bảng Điểm Cầu Lông -->
+    <Input key="input-title" number="5" type="Xaml" title="Bang Diem Cau Long" state="Completed" position="0" duration="0" loop="False" muted="True" volume="100" balance="0" solo="False" audiobuses="M">
+      <Text name="TournamentTitle">{{TOURNAMENT_NAME}}</Text>
+      <Text name="SportType">CẦU LÔNG</Text>
+      <Text name="Description">{{DESCRIPTION}}</Text>
+    </Input>
+  </Inputs>
+  <Streaming>
+    <Profile1>
+      <Destination>Custom RTMP Server</Destination>
+      <URL>{{STREAM_URL}}</URL>
+      <Key>{{STREAM_KEY}}</Key>
+      <Quality>1080p 60fps 6M</Quality>
+    </Profile1>
+  </Streaming>
+</Preset>

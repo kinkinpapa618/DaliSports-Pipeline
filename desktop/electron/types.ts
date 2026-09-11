@@ -30,6 +30,7 @@ export interface TournamentInfo {
   court?: string;
   category?: string;
   sponsor?: string;
+  description?: string;
   hasVideo: boolean;
   videoFile?: string;
   videoSizeMb?: number;
@@ -40,6 +41,37 @@ export interface TournamentInfo {
   clipCount: number;
   uploadedYoutube: boolean;
   uploadedFacebook: boolean;
+  // Livestream fields
+  hasPresetVmix?: boolean;
+  hasBackdrop?: boolean;
+  backdropPath?: string;
+  hasLogos?: boolean;
+  logosCount?: number;
+  hasTvc?: boolean;
+  tvcCount?: number;
+  hasAthletesList?: boolean;
+  hasDieule?: boolean;
+  hasStartBat?: boolean;
+}
+
+export interface CreateTournamentPayload {
+  name: string;
+  sportType: 'badminton' | 'pickleball' | 'tennis' | 'other';
+  date?: string;
+  description?: string;
+  court?: string;
+  sponsor?: string;
+}
+
+export interface BuildVmixPresetResult {
+  success: boolean;
+  presetPath?: string;
+  tournamentName?: string;
+  sport?: string;
+  hasBackdrop?: boolean;
+  logosCount?: number;
+  tvcCount?: number;
+  error?: string;
 }
 
 export interface PipelineOptions {
@@ -83,6 +115,9 @@ export interface EnvConfig {
   FB_PAGE_ACCESS_TOKEN: string;
   YOUTUBE_CLIENT_SECRETS_FILE?: string;
   UPDATE_CHECK_URL?: string;
+  VMIX_EXE_PATH?: string;
+  FACEBOOK_PAGE_URL?: string;
+  VMIX_API_PORT?: string;
   hasCookiesTxt: boolean;
   hasClientSecrets: boolean;
   hasYoutubeToken: boolean;

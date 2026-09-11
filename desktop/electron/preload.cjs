@@ -4,9 +4,17 @@ contextBridge.exposeInMainWorld('api', {
   // Tournaments
   scanTournaments: () => ipcRenderer.invoke('tournaments:scan'),
   createTournament: (date, slug) => ipcRenderer.invoke('tournaments:create', date, slug),
+  createTournamentFull: (payload) => ipcRenderer.invoke('tournaments:createFull', payload),
   updateTournament: (tournamentPath, updates) => ipcRenderer.invoke('tournaments:update', tournamentPath, updates),
   extractVideoInfo: (url) => ipcRenderer.invoke('video:extractInfo', url),
   createTournamentFromVideo: (data) => ipcRenderer.invoke('tournaments:createFromVideo', data),
+  buildVmixPreset: (tournamentPath) => ipcRenderer.invoke('livestream:buildPreset', tournamentPath),
+  startLive: (tournamentPath) => ipcRenderer.invoke('livestream:startLive', tournamentPath),
+  syncDaliSports: () => ipcRenderer.invoke('tournaments:syncDaliSports'),
+  importBackdrop: (tournamentPath) => ipcRenderer.invoke('livestream:importBackdrop', tournamentPath),
+  importLogos: (tournamentPath) => ipcRenderer.invoke('livestream:importLogos', tournamentPath),
+  importTvc: (tournamentPath) => ipcRenderer.invoke('livestream:importTvc', tournamentPath),
+  importAthletes: (tournamentPath) => ipcRenderer.invoke('livestream:importAthletes', tournamentPath),
   openFolder: (dirPath) => ipcRenderer.invoke('system:openFolder', dirPath),
   openUrl: (url) => ipcRenderer.invoke('system:openUrl', url),
 

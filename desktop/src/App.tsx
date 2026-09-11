@@ -76,7 +76,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-[#14181d] text-[#e0e0e0] overflow-hidden font-sans">
+    <div className="h-[100dvh] min-h-[100dvh] w-screen flex flex-col bg-[#14181d] text-[#e0e0e0] overflow-hidden font-sans">
       {/* Frameless Window Custom Titlebar */}
       <TitleBar 
         isPipelineRunning={isPipelineRunning} 
@@ -89,7 +89,7 @@ export const App: React.FC = () => {
 
       {/* Warning when opened in regular browser instead of Electron */}
       {!window.api && (
-        <div className="bg-amber-500/15 border-b border-amber-500/30 px-4 py-2 flex items-center justify-between text-xs text-amber-300">
+        <div className="bg-amber-500/15 border-b border-amber-500/30 px-4 py-2 flex items-center justify-between text-xs text-amber-300 shrink-0">
           <div className="flex items-center gap-2">
             <span className="font-bold">⚠️ Lưu ý:</span>
             <span>Bạn đang xem trên trình duyệt web. Để tạo thư mục và chạy video pipeline, hãy thao tác trên cửa sổ ứng dụng <strong>DaliSports Studio</strong> mở qua <code>start_studio.bat</code>.</span>
@@ -98,7 +98,7 @@ export const App: React.FC = () => {
       )}
 
       {/* Main Container */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden min-h-0 relative">
         {/* Left Navigation Sidebar */}
         <Sidebar
           currentTab={currentTab}
@@ -111,7 +111,7 @@ export const App: React.FC = () => {
         />
 
         {/* Central Work Area */}
-        <main className="flex-1 overflow-hidden bg-[#14181d] relative pb-16 md:pb-0">
+        <main className="flex-1 overflow-hidden bg-[#14181d] relative">
           {currentTab === 'tournaments' && (
             <TournamentsView
               tournaments={tournaments}

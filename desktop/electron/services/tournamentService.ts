@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { execFile } from 'child_process';
-import { TournamentInfo } from '../types';
+import { TournamentInfo, CreateTournamentPayload, BuildVmixPresetResult } from '../types';
 
 export class TournamentService {
   private workspaceRoot: string;
@@ -47,7 +47,12 @@ export class TournamentService {
         let court: string | undefined;
         let category: string | undefined;
         let sponsor: string | undefined;
-        const infoFile = path.join(tournamentPath, 'tournament_info.json');
+        let description: string | undefined;
+        
+        let infoFile = path.join(tournamentPath, 'dieu_hanh', 'tournament_info.json');
+        if (!fs.existsSync(infoFile)) {
+          infoFile = path.join(tournamentPath, 'tournament_info.json');
+        }
         if (fs.existsSync(infoFile)) {
           try {
             const info = JSON.parse(fs.readFileSync(infoFile, 'utf-8'));
@@ -57,6 +62,7 @@ export class TournamentService {
             if (info.court) court = info.court;
             if (info.category) category = info.category;
             if (info.sponsor) sponsor = info.sponsor;
+            if (info.description) description = info.description;
           } catch {}
         }
 
@@ -121,6 +127,53 @@ export class TournamentService {
           uploadedFacebook = true;
         }
 
+        // Check Livestream assets
+        const livestreamDir = path.join(tournamentPath, 'livestream');
+        const hasPresetVmix = fs.existsSync(path.join(livestreamDir, 'preset.vmix'));
+
+        let hasBackdrop = false;
+        let backdropPath: string | undefined;
+        const backdropDir = path.join(livestreamDir, 'backdrop');
+        const imgExts = /\.(png|jpg|jpeg|webp|bmp)$/i;
+        if (fs.existsSync(backdropDir)) {
+          const bFiles = fs.readdirSync(backdropDir).filter(f => imgExts.test(f));
+          if (bFiles.length > 0) {
+            hasBackdrop = true;
+            backdropPath = path.join('livestream', 'backdrop', bFiles[0]);
+          }
+        }
+        if (!hasBackdrop && fs.existsSync(livestreamDir)) {
+          const lFiles = fs.readdirSync(livestreamDir).filter(f => imgExts.test(f));
+          if (lFiles.length > 0) {
+            hasBackdrop = true;
+            backdropPath = path.join('livestream', lFiles[0]);
+          }
+        }
+
+        let logosCount = 0;
+        const logosDir = path.join(livestreamDir, 'logos');
+        if (fs.existsSync(logosDir)) {
+          logosCount = fs.readdirSync(logosDir).filter(f => imgExts.test(f)).length;
+        }
+
+        let tvcCount = 0;
+        const tvcDir = path.join(livestreamDir, 'tvc');
+        const vidExts = /\.(mp4|mov|avi|mkv|ts)$/i;
+        if (fs.existsSync(tvcDir)) {
+          tvcCount = fs.readdirSync(tvcDir).filter(f => vidExts.test(f)).length;
+        }
+
+        const dieuHanhDir = path.join(tournamentPath, 'dieu_hanh');
+        let hasAthletesList = false;
+        let hasDieule = false;
+        if (fs.existsSync(dieuHanhDir)) {
+          const dhFiles = fs.readdirSync(dieuHanhDir);
+          hasAthletesList = dhFiles.some(f => /vdv|danh_sach|athletes/i.test(f) && /\.(xlsx|xls|csv|txt)$/i.test(f));
+          hasDieule = dhFiles.some(f => /dieu_le|quy_dinh|rules/i.test(f) && /\.(txt|docx|doc|pdf)$/i.test(f));
+        }
+
+        const hasStartBat = fs.existsSync(path.join(tournamentPath, 'START.bat'));
+
         results.push({
           id: folderName,
           name,
@@ -132,6 +185,7 @@ export class TournamentService {
           court,
           category,
           sponsor,
+          description,
           hasVideo,
           videoFile,
           videoSizeMb,
@@ -142,6 +196,16 @@ export class TournamentService {
           clipCount,
           uploadedYoutube,
           uploadedFacebook,
+          hasPresetVmix,
+          hasBackdrop,
+          backdropPath,
+          hasLogos: logosCount > 0,
+          logosCount,
+          hasTvc: tvcCount > 0,
+          tvcCount,
+          hasAthletesList,
+          hasDieule,
+          hasStartBat,
         });
       }
 
@@ -195,6 +259,55 @@ export class TournamentService {
       if (!fs.existsSync(targetDir)) {
         fs.mkdirSync(targetDir, { recursive: true });
       }
+
+      // 1. Thư mục điều hành
+      const dieuHanhDir = path.join(targetDir, 'dieu_hanh');
+      fs.mkdirSync(dieuHanhDir, { recursive: true });
+
+      // File tournament_info.json
+      const infoPath = path.join(dieuHanhDir, 'tournament_info.json');
+      if (!fs.existsSync(infoPath)) {
+        const prettyName = cleanSlug.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        const infoData = {
+          name: prettyName,
+          slug: formattedSlug,
+          date: dateStr,
+          sportType: 'badminton',
+          description: `Trực tiếp và phát sóng giải ${prettyName}.`,
+          court: 'Sân 1',
+          sponsor: '',
+          created_at: new Date().toISOString()
+        };
+        fs.writeFileSync(infoPath, JSON.stringify(infoData, null, 2), 'utf-8');
+      }
+
+      // Copy file mẫu điều lệ & danh sách VĐV nếu có
+      const sampleDieuLe = path.join(this.workspaceRoot, 'templates', 'samples', 'dieu_le.txt');
+      const targetDieuLe = path.join(dieuHanhDir, 'dieu_le.txt');
+      if (fs.existsSync(sampleDieuLe) && !fs.existsSync(targetDieuLe)) {
+        fs.copyFileSync(sampleDieuLe, targetDieuLe);
+      }
+
+      const sampleVdv = path.join(this.workspaceRoot, 'templates', 'samples', 'danh_sach_vdv.csv');
+      const targetVdv = path.join(dieuHanhDir, 'danh_sach_vdv.csv');
+      if (fs.existsSync(sampleVdv) && !fs.existsSync(targetVdv)) {
+        fs.copyFileSync(sampleVdv, targetVdv);
+      }
+
+      // 2. Thư mục livestream
+      const livestreamDir = path.join(targetDir, 'livestream');
+      fs.mkdirSync(path.join(livestreamDir, 'backdrop'), { recursive: true });
+      fs.mkdirSync(path.join(livestreamDir, 'logos'), { recursive: true });
+      fs.mkdirSync(path.join(livestreamDir, 'tvc'), { recursive: true });
+
+      // 3. Copy file START.bat
+      const sampleStart = path.join(this.workspaceRoot, 'templates', 'samples', 'START.bat');
+      const targetStart = path.join(targetDir, 'START.bat');
+      if (fs.existsSync(sampleStart) && !fs.existsSync(targetStart)) {
+        fs.copyFileSync(sampleStart, targetStart);
+      }
+
+      // 4. Thư mục hậu kỳ (video, clips, thumbnails)
       fs.mkdirSync(path.join(targetDir, 'video'), { recursive: true });
       fs.mkdirSync(path.join(targetDir, 'clips'), { recursive: true });
       fs.mkdirSync(path.join(targetDir, 'thumbnails'), { recursive: true });
@@ -212,11 +325,132 @@ export class TournamentService {
         fs.writeFileSync(initialTimelinePath, JSON.stringify(initialData, null, 2), 'utf-8');
       }
 
+      // Tự động sinh preset.vmix ban đầu
+      this.buildVmixPreset(targetDir).catch(() => {});
+
       return { success: true, folderName, path: targetDir };
     } catch (err: any) {
       console.error('Lỗi tạo thư mục giải đấu:', err);
       return { success: false, folderName: '', path: '', error: err.message };
     }
+  }
+
+  public createTournamentFull(payload: CreateTournamentPayload): { success: boolean; folderName: string; path: string; error?: string } {
+    try {
+      const name = payload.name.trim();
+      const dateStr = payload.date || new Date().toISOString().split('T')[0];
+      const res = this.createTournament(dateStr, name);
+      if (!res.success) return res;
+
+      // Cập nhật thông tin chi tiết vào tournament_info.json
+      const infoPath = path.join(res.path, 'dieu_hanh', 'tournament_info.json');
+      const infoData = {
+        name,
+        slug: res.folderName.substring(11),
+        date: dateStr,
+        sportType: payload.sportType || 'badminton',
+        description: payload.description || `Trực tiếp và phát sóng giải ${name}.`,
+        court: payload.court || 'Sân chính',
+        sponsor: payload.sponsor || '',
+        created_at: new Date().toISOString()
+      };
+      fs.writeFileSync(infoPath, JSON.stringify(infoData, null, 2), 'utf-8');
+
+      // Tái tạo preset.vmix với thông tin vừa lưu
+      this.buildVmixPreset(res.path).catch(() => {});
+
+      return res;
+    } catch (err: any) {
+      return { success: false, folderName: '', path: '', error: err.message };
+    }
+  }
+
+  public async buildVmixPreset(tournamentPath: string): Promise<BuildVmixPresetResult> {
+    const scriptPath = path.join(this.workspaceRoot, 'system', 'vmix_preset_builder.py');
+    return new Promise((resolve) => {
+      execFile(
+        'python',
+        ['-u', scriptPath, '--tournament', tournamentPath, '--json'],
+        { cwd: this.workspaceRoot },
+        (error, stdout, stderr) => {
+          if (error) {
+            console.error('[buildVmixPreset] error:', stderr || error.message);
+            resolve({ success: false, error: stderr || error.message });
+            return;
+          }
+          try {
+            const parsed = JSON.parse(stdout.trim());
+            resolve(parsed);
+          } catch (e: any) {
+            resolve({ success: true, presetPath: path.join(tournamentPath, 'livestream', 'preset.vmix') });
+          }
+        }
+      );
+    });
+  }
+
+  public async startLive(tournamentPath: string): Promise<{ success: boolean; error?: string }> {
+    const batPath = path.join(tournamentPath, 'START.bat');
+    const { spawn } = await import('child_process');
+
+    if (fs.existsSync(batPath)) {
+      // Bật cửa sổ cmd riêng cho START.bat
+      spawn('cmd.exe', ['/c', 'start', 'cmd.exe', '/k', batPath], {
+        detached: true,
+        stdio: 'ignore',
+        cwd: tournamentPath
+      }).unref();
+      return { success: true };
+    }
+
+    const scriptPath = path.join(this.workspaceRoot, 'system', 'start_live_orchestrator.py');
+    spawn('cmd.exe', ['/c', 'start', 'cmd.exe', '/k', 'python', scriptPath, '--tournament', tournamentPath], {
+      detached: true,
+      stdio: 'ignore',
+      cwd: this.workspaceRoot
+    }).unref();
+
+    return { success: true };
+  }
+
+  public async syncDaliSports(): Promise<any> {
+    const scriptPath = path.join(this.workspaceRoot, 'system', 'sync_dalisports.py');
+    return new Promise((resolve) => {
+      execFile(
+        'python',
+        ['-u', scriptPath],
+        {
+          cwd: this.workspaceRoot,
+          env: {
+            ...process.env,
+            PYTHONIOENCODING: 'utf-8',
+            PYTHONUNBUFFERED: '1',
+          },
+          timeout: 45000,
+        },
+        (error, stdout, stderr) => {
+          if (error) {
+            console.error('Lỗi khi đồng bộ từ app.dalisports.vn:', error.message, stderr);
+            resolve({ success: false, error: error.message });
+            return;
+          }
+          try {
+            const marker = '[JSON RESULT]';
+            const idx = stdout.lastIndexOf(marker);
+            if (idx !== -1) {
+              const jsonStr = stdout.substring(idx + marker.length).trim();
+              const res = JSON.parse(jsonStr);
+              resolve(res);
+              return;
+            }
+            const res = JSON.parse(stdout.trim());
+            resolve(res);
+          } catch (e: any) {
+            resolve({ success: false, error: 'Không thể phân tích dữ liệu JSON: ' + e.message, raw: stdout });
+          }
+        }
+      );
+    });
   }
 
   public async extractVideoInfo(url: string): Promise<any> {
@@ -369,6 +603,98 @@ export class TournamentService {
       // Avoid overwriting if same file
       if (path.resolve(sourceVideoPath) !== path.resolve(dest)) {
         fs.copyFileSync(sourceVideoPath, dest);
+      }
+      return { success: true, dest };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  }
+
+  public async importBackdropFile(tournamentPath: string, sourceImagePath: string): Promise<{ success: boolean; dest?: string; error?: string }> {
+    try {
+      if (!fs.existsSync(tournamentPath)) return { success: false, error: 'Giải đấu không tồn tại.' };
+      if (!fs.existsSync(sourceImagePath)) return { success: false, error: 'File ảnh backdrop không tồn tại.' };
+      
+      const backdropDir = path.join(tournamentPath, 'livestream', 'backdrop');
+      fs.mkdirSync(backdropDir, { recursive: true });
+      
+      // Xóa backdrop cũ nếu có
+      const oldFiles = fs.readdirSync(backdropDir);
+      for (const f of oldFiles) {
+        try { fs.unlinkSync(path.join(backdropDir, f)); } catch {}
+      }
+
+      const dest = path.join(backdropDir, path.basename(sourceImagePath));
+      if (path.resolve(sourceImagePath) !== path.resolve(dest)) {
+        fs.copyFileSync(sourceImagePath, dest);
+      }
+      
+      await this.buildVmixPreset(tournamentPath);
+      return { success: true, dest };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  }
+
+  public async importLogosFiles(tournamentPath: string, sourcePaths: string[]): Promise<{ success: boolean; count?: number; error?: string }> {
+    try {
+      if (!fs.existsSync(tournamentPath)) return { success: false, error: 'Giải đấu không tồn tại.' };
+      const logosDir = path.join(tournamentPath, 'livestream', 'logos');
+      fs.mkdirSync(logosDir, { recursive: true });
+
+      let count = 0;
+      for (const p of sourcePaths) {
+        if (fs.existsSync(p)) {
+          const dest = path.join(logosDir, path.basename(p));
+          if (path.resolve(p) !== path.resolve(dest)) {
+            fs.copyFileSync(p, dest);
+          }
+          count++;
+        }
+      }
+
+      await this.buildVmixPreset(tournamentPath);
+      return { success: true, count };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  }
+
+  public async importTvcFiles(tournamentPath: string, sourcePaths: string[]): Promise<{ success: boolean; count?: number; error?: string }> {
+    try {
+      if (!fs.existsSync(tournamentPath)) return { success: false, error: 'Giải đấu không tồn tại.' };
+      const tvcDir = path.join(tournamentPath, 'livestream', 'tvc');
+      fs.mkdirSync(tvcDir, { recursive: true });
+
+      let count = 0;
+      for (const p of sourcePaths) {
+        if (fs.existsSync(p)) {
+          const dest = path.join(tvcDir, path.basename(p));
+          if (path.resolve(p) !== path.resolve(dest)) {
+            fs.copyFileSync(p, dest);
+          }
+          count++;
+        }
+      }
+
+      await this.buildVmixPreset(tournamentPath);
+      return { success: true, count };
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  }
+
+  public async importAthletesFile(tournamentPath: string, sourcePath: string): Promise<{ success: boolean; dest?: string; error?: string }> {
+    try {
+      if (!fs.existsSync(tournamentPath)) return { success: false, error: 'Giải đấu không tồn tại.' };
+      if (!fs.existsSync(sourcePath)) return { success: false, error: 'File danh sách VĐV không tồn tại.' };
+      
+      const dieuHanhDir = path.join(tournamentPath, 'dieu_hanh');
+      fs.mkdirSync(dieuHanhDir, { recursive: true });
+      
+      const dest = path.join(dieuHanhDir, path.basename(sourcePath));
+      if (path.resolve(sourcePath) !== path.resolve(dest)) {
+        fs.copyFileSync(sourcePath, dest);
       }
       return { success: true, dest };
     } catch (err: any) {
